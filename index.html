@@ -3,6 +3,13 @@
 <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js'></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
 <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css' rel='stylesheet' />
+<link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+<style>
+.mapboxgl-popup {
+  max-width: 400px;
+  font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+</style>
 </head>
 <body>
 <div id='map' style='width: 1000px; height: 700px;'></div>
@@ -109,6 +116,27 @@ map.addControl(new mapboxgl.NavigationControl({showCompass: false}));
 
 var source = document.getElementById("popup-template").innerHTML;
 var popupTemplate = Handlebars.compile(source);
+
+var COLORS = {
+  "-1000": "gray",
+  "0": "#3b0000",
+  "10000": "#9ec500",
+  "2500": "#ff0000",
+  "4166": "#ffbb00",
+  "1000": "#950004",
+  "6250": "#deec00",
+  "7500": "#bed900",
+  "2000": "#c60003",
+  "625": "#6d0003",
+  "5000": "#ffff00",
+  "3000": "#ff6e00",
+  "12500": "#7eb100",
+  "3125": "#ff8300",
+  "20000": "#207700",
+  "22500": "#006400",
+  "17500": "#428c00",
+  "15000": "#609e00"
+};
 
 map.on('load', function () {
   map.addLayer({
