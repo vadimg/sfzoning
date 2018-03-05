@@ -1,5 +1,6 @@
+import math
 
-zoning = """
+ZONING = """
 RH-1(D)	4000
 RH-1	3000
 RH-1(S)	1500
@@ -98,18 +99,78 @@ P	1.00E+09
 
 
 lot_size_per_unit = {}
-for l in zoning.split('\n'):
+for l in ZONING.split('\n'):
     if l.strip():
         code, numstring = l.split('\t')
         lot_size_per_unit[code] = float(numstring)
 
 
+LOT_SIZE_PER = 2500.0
+AVG_APT_SIZE = 800.0
+
+
 def units_per_2500sqft(zone):
     fixed = {
-        'RH-1(D)': 1.0 * (2500/4000),  # minimum lot size 4000 sq ft
+        'P': -1,  # parks are < 0
+        'RH-1(D)': 1.0 * (LOT_SIZE_PER / 4000),  # minimum lot size 4000 sq ft
         'RH-1': 1,
         'RH-1(S)': 2,
         'RH-2': 2,
         'RH-3': 3,
     }
-    return fixed.get(zone, 2500.0 / lot_size_per_unit[zone])
+    n = fixed.get(zone)
+    if n is not None:
+        return n
+
+    lot_size = lot_size_per_unit[zone]
+
+    if lot_size > 1e6:
+        return 0
+    if lot_size == 0:
+        return 1e9
+    return LOT_SIZE_PER / lot_size
+
+
+def units_per_height(height_code, height_num):
+    if 'OS' in height_code:
+        return -1
+
+    sq_ft = LOT_SIZE_PER * .8  # 80% efficiency
+
+    apts_per_floor = sq_ft / AVG_APT_SIZE
+    floors = math.floor(height_num / 10.0)
+
+    return apts_per_floor * floors
+
+COLORS = """
+-1	gray
+0	#3b0000
+0.625	#6d0003
+1	#950004
+2	#c60003
+2.5	#ff0000
+3	#ff6e00
+3.125	#ffa300
+4.166666667	#ffd200
+5	#ffff00
+6.25	#deec00
+7.5	#bed900
+10	#9ec500
+12.5	#7eb100
+15	#609e00
+17.5	#428c00
+20	#207700
+22.5	#006400
+"""
+
+colors = {}
+for l in COLORS.split('\n'):
+    if l.strip():
+        units, color = l.split('\t')
+        colors[int(1000*float(units))] = color
+
+
+def color(units):
+    if units > 20:
+        return colors[int(22.5*1000)]
+    return colors[int(units*1000)]

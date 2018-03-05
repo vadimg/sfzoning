@@ -63,5 +63,5 @@ for r in res:
         geometry=shapely.geometry.geo.mapping(r.polygon),
     ))
 
-with open('res2.geojson', 'w') as f:
+with open('res.geojson', 'w') as f:
     json.dump(dict(type='FeatureCollection', features=obj), f)
