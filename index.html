@@ -1,12 +1,95 @@
 <html>
 <head>
 <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
 <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css' rel='stylesheet' />
 </head>
 <body>
 <div id='map' style='width: 1000px; height: 700px;'></div>
+
+<!-- templates -->
+<div style="display: none">
+  <div id='popup-template'>
+    <h5>Detail:</h5>
+    {{#compare homes "==" -1 }}
+    Open Space
+    {{else}}
+    <ul class="list-group">
+      <li class="list-group-item">Homes per 2500 sq ft: {{round homes 3}}</li>
+      <li class="list-group-item">Max homes due to density limit:
+        {{#compare homes_zoning ">" 10000 }}
+        No limit
+        {{else}}
+        {{round homes_zoning 3}}
+        {{/compare}}
+      </li>
+      <li class="list-group-item">Max homes due to height limit: {{round homes_height 3}}</li>
+      <li class="list-group-item">Zoning code: {{ zoning }}</li>
+      <li class="list-group-item">Height limit code: {{ height_str }}</li>
+    </ul>
+    {{/compare}}
+  </div>
+</div>
+<!-- end templates -->
+
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoiZGltdmEiLCJhIjoiY2plYzhtMTM5MG5yazJ4bGE0OHZrcHpnZCJ9.u9hqKMLwpq-JHGyhAW2GeQ';
+
+Handlebars.registerHelper('round', function(num, places, options) {
+    if (arguments.length < 3) {
+      throw new Error("Handlebars Helper round needs 2 parameters");
+    }
+    var e = Math.pow(10, places);
+    return Math.round(num*e) / e;
+});
+
+function htmlDecode(input)
+{
+  var doc = new DOMParser().parseFromString(input, "text/html");
+  return doc.documentElement.textContent;
+}
+
+Handlebars.registerHelper('compare', function (lvalue, operator, rvalue, options) {
+
+    var operators, result;
+
+    if (arguments.length < 3) {
+        throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
+    }
+
+    if (options === undefined) {
+        options = rvalue;
+        rvalue = operator;
+        operator = "===";
+    }
+
+    operator = htmlDecode(operator);
+
+    operators = {
+        '==': function (l, r) { return l == r; },
+        '===': function (l, r) { return l === r; },
+        '!=': function (l, r) { return l != r; },
+        '!==': function (l, r) { return l !== r; },
+        '<': function (l, r) { return l < r; },
+        '>': function (l, r) { return l > r; },
+        '<=': function (l, r) { return l <= r; },
+        '>=': function (l, r) { return l >= r; },
+        'typeof': function (l, r) { return typeof l == r; }
+    };
+
+    if (!operators[operator]) {
+        throw new Error("Handlerbars Helper 'compare' doesn't know the operator " + operator);
+    }
+
+    result = operators[operator](lvalue, rvalue);
+
+    if (result) {
+        return options.fn(this);
+    } else {
+        return options.inverse(this);
+    }
+
+});
 
 var map = new mapboxgl.Map({
     container: 'map', // container id
@@ -14,9 +97,6 @@ var map = new mapboxgl.Map({
     center: [-122.431297, 37.773972], // starting position
     zoom: 11.5 // starting zoom
 });
-
-// disable pitching
-//map.pitchWithRotate.disable();
 
 // disable map rotation using right click + drag
 map.dragRotate.disable();
@@ -26,6 +106,9 @@ map.touchZoomRotate.disableRotation();
 
 // Add zoom and rotation controls to the map.
 map.addControl(new mapboxgl.NavigationControl({showCompass: false}));
+
+var source = document.getElementById("popup-template").innerHTML;
+var popupTemplate = Handlebars.compile(source);
 
 map.on('load', function () {
   map.addLayer({
@@ -47,7 +130,7 @@ map.on('load', function () {
       var prop = e.features[0].properties;
         new mapboxgl.Popup()
             .setLngLat(e.lngLat)
-            .setHTML("Homes: " + prop.homes)
+            .setHTML(popupTemplate(prop))
             .addTo(map);
     });
 });
