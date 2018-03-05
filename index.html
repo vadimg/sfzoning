@@ -23,7 +23,7 @@
     {{else}}
     <ul class="list-group">
       <li class="list-group-item">Homes per 2500 sq ft: {{round homes 3}}</li>
-      <li class="list-group-item">Max homes due to density limit:
+      <li class="list-group-item">Max homes due to zoning code:
         {{#compare homes_zoning ">" 10000 }}
         No limit
         {{else}}
