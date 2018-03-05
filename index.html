@@ -1,0 +1,47 @@
+<html>
+<head>
+<script src='https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css' rel='stylesheet' />
+</head>
+<body>
+<div id='map' style='width: 1000px; height: 700px;'></div>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiZGltdmEiLCJhIjoiY2plYzhtMTM5MG5yazJ4bGE0OHZrcHpnZCJ9.u9hqKMLwpq-JHGyhAW2GeQ';
+
+var map = new mapboxgl.Map({
+    container: 'map', // container id
+    style: 'mapbox://styles/mapbox/streets-v9',
+    center: [-122.431297, 37.773972], // starting position
+    zoom: 11.5 // starting zoom
+});
+
+// Add zoom and rotation controls to the map.
+map.addControl(new mapboxgl.NavigationControl());
+
+map.on('load', function () {
+  map.addLayer({
+      'id': 'zones-layer',
+      'type': 'fill',
+      'source': {
+          'type': 'geojson',
+          'data': '/debug.geojson'
+      },
+      'paint': {
+          'fill-color': 'rgba(200, 0, 0, 0.4)',
+      }
+  });
+
+    // When a click event occurs on a feature in the states layer, open a popup at the
+    // location of the click, with description HTML from its properties.
+    map.on('click', 'zones-layer', function (e) {
+      var prop = e.features[0].properties;
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(JSON.stringify(prop)) //.index + ": " + prop.zoning + ": " + prop.height + " (" + prop.height_index)
+            .addTo(map);
+    });
+});
+
+</script>
+</body>
+</html>
