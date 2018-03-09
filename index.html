@@ -1,9 +1,9 @@
 <html>
 <head>
-<script src='https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js'></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
-<link href='https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css' rel='stylesheet' />
-<link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+<link href="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
+<link href="https://www.mapbox.com/base/latest/base.css" rel="stylesheet" />
 <style>
 #map {
   position: absolute;
@@ -15,7 +15,7 @@
 
 .mapboxgl-popup {
   max-width: 400px;
-  font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
 
 .legend {
@@ -23,7 +23,7 @@
   border-radius: 3px;
   bottom: 30px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
   padding: 10px;
   position: absolute;
   right: 10px;
@@ -32,6 +32,7 @@
 
 .legend h4 {
   margin: 0 0 10px;
+  text-align: center;
 }
 
 .legend p {
@@ -52,20 +53,34 @@
   margin-right: 5px;
   opacity: 0.7;
 }
+
+.legend .fineprint {
+  font-size: 10px;
+  font-color: lightgray;
+}
 </style>
 </head>
 <body>
-<div id='map'></div>
-<div id='legend' class='legend'>
-  <h4>Homes per 2,500 sq ft</h4>
+<div id="map"></div>
+<div class="legend">
+  <h4>Max. Allowed Homes<br/>
+    per 2,500 sq ft</h4>
+  <div id="legend"></div>
+  <p class="fineprint">2,500 sq ft is a typical lot size in San Francisco
+  <p class="fineprint">Includes waiverless ADUs
+  <p class="fineprint">Assumes 2.5 apartments per floor per 2,500 sq ft
 </div>
 
 <!-- templates -->
 <div style="display: none">
-  <div id='popup-template'>
-    <h5>Detail:</h5>
+  <div id="popup-template">
+    <h4>Details:</h4>
+    {{#compare homes "<=" 0 }}
     {{#compare homes "==" -1 }}
     Open Space
+    {{else}}
+    No housing allowed - Commercial / Industrial / Office use only
+    {{/compare}}
     {{else}}
     <ul class="list-group">
       <li class="list-group-item">Homes per 2500 sq ft: {{round homes 3}}</li>
@@ -84,7 +99,9 @@
   </div>
   <div id="legend-item-template">
     <div>
-      <span style="background-color: {{ color }}"></span>
+      <span style="background-color: {{ color }}">
+        {{ percentage }}%
+      </span>
       <p>
         {{#compare num ">" 20 }}
         &gt; 20
@@ -179,26 +196,93 @@ map.addControl(new mapboxgl.NavigationControl({showCompass: false}));
 var popupTemplate = Handlebars.compile(document.getElementById("popup-template").innerHTML);
 var legendItemTemplate = Handlebars.compile(document.getElementById("legend-item-template").innerHTML);
 
-var COLORS = {
-  "-1000": "gray",
-  "0": "#3b0000",
-  "10000": "#9ec500",
-  "2500": "#ff0000",
-  "4166": "#ffbb00",
-  "1000": "#950004",
-  "6250": "#deec00",
-  "7500": "#bed900",
-  "2000": "#c60003",
-  "625": "#6d0003",
-  "5000": "#ffff00",
-  "3000": "#ff6e00",
-  "12500": "#7eb100",
-  "3125": "#ff8300",
-  "20000": "#207700",
-  "22500": "#006400",
-  "17500": "#428c00",
-  "15000": "#609e00"
-};
+var KEY_DATA = [
+  {
+    "color": "gray",
+    "percentage": 32.08307863407301,
+    "homes1000": -1000
+  },
+  {
+    "color": "#3b0000",
+    "percentage": 10.050558016216783,
+    "homes1000": 0
+  },
+  {
+    "color": "#950004",
+    "percentage": 7.363627652698533,
+    "homes1000": 1250
+  },
+  {
+    "color": "#c60003",
+    "percentage": 29.045071491562908,
+    "homes1000": 2000
+  },
+  {
+    "color": "#ff0000",
+    "percentage": 0.03138626345787019,
+    "homes1000": 2500
+  },
+  {
+    "color": "#ff6e00",
+    "percentage": 3.239481888371228,
+    "homes1000": 3000
+  },
+  {
+    "color": "#ff8300",
+    "percentage": 5.117287426187047,
+    "homes1000": 3125
+  },
+  {
+    "color": "#ffbb00",
+    "percentage": 2.4721982542381635,
+    "homes1000": 4167
+  },
+  {
+    "color": "#ffff00",
+    "percentage": 2.84629275689778e-09,
+    "homes1000": 5000
+  },
+  {
+    "color": "#deec00",
+    "percentage": 1.37776937177379,
+    "homes1000": 6250
+  },
+  {
+    "color": "#bed900",
+    "percentage": 0.007853922526348209,
+    "homes1000": 7500
+  },
+  {
+    "color": "#9ec500",
+    "percentage": 1.8856732168991333,
+    "homes1000": 10000
+  },
+  {
+    "color": "#7eb100",
+    "percentage": 2.185190764242557,
+    "homes1000": 12500
+  },
+  {
+    "color": "#609e00",
+    "percentage": 0.9742242094562791,
+    "homes1000": 15000
+  },
+  {
+    "color": "#428c00",
+    "percentage": 0.009225311627956348,
+    "homes1000": 17500
+  },
+  {
+    "color": "#207700",
+    "percentage": 0.4630441407062209,
+    "homes1000": 20000
+  },
+  {
+    "color": "#006400",
+    "percentage": 3.6715952783795274,
+    "homes1000": 22500
+  }
+];
 
 map.on('load', function () {
   map.addLayer({
@@ -226,13 +310,16 @@ map.on('load', function () {
 
     var legend = document.getElementById('legend');
 
-    var nums = Object.keys(COLORS);
-    nums.sort(function(a, b) { return a - b; });
-    nums.forEach(function(numStr) {
-      var n = Number(numStr) / 1000;
+    KEY_DATA.forEach(function(data) {
+      var n = data['homes1000'] / 1000;
+      var roundedPercentage = Math.round(10*data['percentage'])/10;
+      if (roundedPercentage == 0) {
+        return;
+      }
       legend.insertAdjacentHTML('beforeend', legendItemTemplate({
             num: n,
-            color: COLORS[numStr]
+            percentage: roundedPercentage,
+            color: data['color']
       }));
     });
 });

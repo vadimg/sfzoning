@@ -109,11 +109,11 @@ LOT_SIZE_PER = 2500.0
 AVG_APT_SIZE = 800.0
 
 
-def units_per_2500sqft(zone):
+def units_per_density_limit(zone):
     fixed = {
         'P': -1,  # parks are < 0
-        'RH-1(D)': 1.0 * (LOT_SIZE_PER / 4000),  # minimum lot size 4000 sq ft
-        'RH-1': 1,
+        'RH-1(D)': 2.0 * (LOT_SIZE_PER / 4000),  # minimum lot size 4000 sq ft
+        'RH-1': 2,
         'RH-1(S)': 2,
         'RH-2': 2,
         'RH-3': 3,
@@ -146,7 +146,7 @@ COLORS = """
 -1	gray
 0	#3b0000
 0.625	#6d0003
-1	#950004
+1.25	#950004
 2	#c60003
 2.5	#ff0000
 3	#ff6e00
