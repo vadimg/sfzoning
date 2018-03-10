@@ -5,12 +5,15 @@
 <link href="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
 <link href="https://www.mapbox.com/base/latest/base.css" rel="stylesheet" />
 <style>
+
+h1 {
+  background-color: #EBE7E1;
+  text-align: center;
+}
+
 #map {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .mapboxgl-popup {
@@ -28,25 +31,38 @@
   position: absolute;
   right: 10px;
   z-index: 1;
+  width: 300px;
 }
 
 .legend h4 {
-  margin: 0 0 10px;
+  margin: 0;
   text-align: center;
 }
 
-.legend p {
-  margin-left: 30px;
-  position: absolute;
+.legend h5 {
+  margin: -3px 0 10px;
+  text-align: center;
+  font-size: 10px;
+}
+
+.legend .legend-item {
   display: block;
-  top: 0;
+  margin-top: 5px;
 }
 
-.legend div {
-  position: relative;
+.legend-item span {
+  vertical-align: top;
 }
 
-.legend div span {
+.legend-item .percentage {
+  width: 50px;
+  text-align: right;
+  display: inline-block;
+  font-size: 10px;
+  color: lightgray;
+}
+
+.legend .color-box {
   width: 20px;
   height: 20px;
   display: inline-block;
@@ -54,21 +70,46 @@
   opacity: 0.7;
 }
 
-.legend .fineprint {
+.legend .section {
+  margin-top: 10px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.legend .color-explanation {
+  margin-bottom: 10px;
+}
+.legend .color-explanation p {
+  margin: -5px 0;
+}
+
+.legend .fineprint p {
   font-size: 10px;
-  font-color: lightgray;
+  color: gray;
+  margin: 5px 0;
+  line-height: 10px;
 }
 </style>
 </head>
 <body>
+<h1>Apartment buildings are illegal to build in 89.3% of San Francisco</h1>
 <div id="map"></div>
 <div class="legend">
-  <h4>Max. Allowed Homes<br/>
-    per 2,500 sq ft</h4>
-  <div id="legend"></div>
-  <p class="fineprint">2,500 sq ft is a typical lot size in San Francisco
-  <p class="fineprint">Includes waiverless ADUs
-  <p class="fineprint">Assumes 2.5 apartments per floor per 2,500 sq ft
+  <h4>Max. Allowed Homes</h4>
+  <h5>(per 2,500 sq ft plot of land)</h5>
+  <div class="section color-explanation">
+    <p><strong style="color: red">Red</strong> means single-family or duplexes <em>only</em>
+    <p><strong style="color: orange">Orange</strong> means triplexes or quad-plexes are legal
+    <p><strong style="color: green">Green</strong> means apartment buildings are legal
+  </div>
+  <div id="legend-data"></div>
+  <div class="fineprint section">
+    <p>2,500 sq ft is a typical lot size in San Francisco
+    <p>Assumes 2.5 apartments per 10 ft of height per 2,500 sq ft
+    <p>Includes <a href="http://sf-planning.org/accessory-dwelling-units" target="_blank">waiverless ADUs</a>
+    <p>Many apartment buildings already exist in the red and orange areas but would be illegal to build today
+    <p>You can see why new development is concentrated in the Mission, Soma, and Tenderloin neighborhoods
+  </div>
 </div>
 
 <!-- templates -->
@@ -98,13 +139,15 @@
     {{/compare}}
   </div>
   <div id="legend-item-template">
-    <div>
-      <span style="background-color: {{ color }}">
-        {{ percentage }}%
+    <div class="legend-item">
+      <span class="percentage">
+      {{ percentage }}%
       </span>
-      <p>
+      <span class="color-box" style="background-color: {{ color }}">
+      </span>
+      <span>
         {{#compare num ">" 20 }}
-        &gt; 20
+        more than 20
         {{else}}{{#compare num "==" -1 }}
         Open Space
         {{else}}{{#compare num "==" 0 }}
@@ -112,7 +155,7 @@
         {{else}}
         {{ num }}
         {{/compare}}{{/compare}}{{/compare}}
-      </p>
+      </span>
     </div>
   </div>
 </div>
@@ -308,7 +351,7 @@ map.on('load', function () {
             .addTo(map);
     });
 
-    var legend = document.getElementById('legend');
+    var legend = document.getElementById('legend-data');
 
     KEY_DATA.forEach(function(data) {
       var roundedPercentage = Math.round(10*data['percentage'])/10;
