@@ -360,7 +360,7 @@ map.on('load', function () {
       }
       legend.insertAdjacentHTML('beforeend', legendItemTemplate({
             num: Math.round(data['homes']*1000)/1000,
-            percentage: roundedPercentage,
+            percentage: roundedPercentage.toFixed(1),
             color: data['color']
       }));
     });
