@@ -28,7 +28,7 @@ all_area = sum(home_areas.itervalues())
 dat = []
 for m in sorted(home_areas.keys()):
     dat.append({
-        "homes1000": int(round(m * 1000)),
+        "homes": m,
         "percentage": 100.0 * home_areas[m] / all_area,
         "color": color(m),
     })

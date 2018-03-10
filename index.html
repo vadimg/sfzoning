@@ -199,88 +199,88 @@ var legendItemTemplate = Handlebars.compile(document.getElementById("legend-item
 var KEY_DATA = [
   {
     "color": "gray",
-    "percentage": 32.08307863407301,
-    "homes1000": -1000
+    "homes": -1,
+    "percentage": 32.08307863407301
   },
   {
     "color": "#3b0000",
-    "percentage": 10.050558016216783,
-    "homes1000": 0
+    "homes": 0,
+    "percentage": 10.050558016216783
   },
   {
     "color": "#950004",
-    "percentage": 7.363627652698533,
-    "homes1000": 1250
+    "homes": 1.25,
+    "percentage": 7.363627652698533
   },
   {
     "color": "#c60003",
-    "percentage": 29.045071491562908,
-    "homes1000": 2000
+    "homes": 2,
+    "percentage": 29.045071491562908
   },
   {
     "color": "#ff0000",
-    "percentage": 0.03138626345787019,
-    "homes1000": 2500
+    "homes": 2.5,
+    "percentage": 0.03138626345787019
   },
   {
     "color": "#ff6e00",
-    "percentage": 3.239481888371228,
-    "homes1000": 3000
+    "homes": 3,
+    "percentage": 3.239481888371228
   },
   {
     "color": "#ff8300",
-    "percentage": 5.117287426187047,
-    "homes1000": 3125
+    "homes": 3.125,
+    "percentage": 5.117287426187047
   },
   {
     "color": "#ffbb00",
-    "percentage": 2.4721982542381635,
-    "homes1000": 4167
+    "homes": 4.166666666666667,
+    "percentage": 2.4721982542381635
   },
   {
     "color": "#ffff00",
-    "percentage": 2.84629275689778e-09,
-    "homes1000": 5000
+    "homes": 5.0,
+    "percentage": 2.84629275689778e-09
   },
   {
     "color": "#deec00",
-    "percentage": 1.37776937177379,
-    "homes1000": 6250
+    "homes": 6.25,
+    "percentage": 1.37776937177379
   },
   {
     "color": "#bed900",
-    "percentage": 0.007853922526348209,
-    "homes1000": 7500
+    "homes": 7.5,
+    "percentage": 0.007853922526348209
   },
   {
     "color": "#9ec500",
-    "percentage": 1.8856732168991333,
-    "homes1000": 10000
+    "homes": 10.0,
+    "percentage": 1.8856732168991333
   },
   {
     "color": "#7eb100",
-    "percentage": 2.185190764242557,
-    "homes1000": 12500
+    "homes": 12.5,
+    "percentage": 2.185190764242557
   },
   {
     "color": "#609e00",
-    "percentage": 0.9742242094562791,
-    "homes1000": 15000
+    "homes": 15.0,
+    "percentage": 0.9742242094562791
   },
   {
     "color": "#428c00",
-    "percentage": 0.009225311627956348,
-    "homes1000": 17500
+    "homes": 17.5,
+    "percentage": 0.009225311627956348
   },
   {
     "color": "#207700",
-    "percentage": 0.4630441407062209,
-    "homes1000": 20000
+    "homes": 20.0,
+    "percentage": 0.4630441407062209
   },
   {
     "color": "#006400",
-    "percentage": 3.6715952783795274,
-    "homes1000": 22500
+    "homes": 22.5,
+    "percentage": 3.6715952783795274
   }
 ];
 
@@ -311,13 +311,12 @@ map.on('load', function () {
     var legend = document.getElementById('legend');
 
     KEY_DATA.forEach(function(data) {
-      var n = data['homes1000'] / 1000;
       var roundedPercentage = Math.round(10*data['percentage'])/10;
       if (roundedPercentage == 0) {
         return;
       }
       legend.insertAdjacentHTML('beforeend', legendItemTemplate({
-            num: n,
+            num: Math.round(data['homes']*1000)/1000,
             percentage: roundedPercentage,
             color: data['color']
       }));
