@@ -3,7 +3,7 @@ from shapely.geometry import shape
 
 from calc import units_per_density_limit, units_per_height, color
 
-with open('res.geojson') as f:
+with open('generated/res.geojson') as f:
     obj = json.load(f)
 
 home_areas = {}
@@ -42,5 +42,5 @@ dat[-1]['percentage'] = 100 - total_percent
 
 print json.dumps(dat, indent=2)
 
-with open('res2.geojson', 'w') as f:
+with open('generated/res2.geojson', 'w') as f:
     json.dump(obj, f)
