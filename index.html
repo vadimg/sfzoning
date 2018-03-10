@@ -120,7 +120,10 @@ h1 {
     {{#compare homes "==" -1 }}
     Open Space
     {{else}}
-    No housing allowed - Commercial / Industrial / Office use only
+    <ul class="list-group">
+      <li class="list-group-item">No housing allowed - Commercial / Industrial / Office use only</li>
+      <li class="list-group-item">Zoning code: {{ zoning }}</li>
+    </ul>
     {{/compare}}
     {{else}}
     <ul class="list-group">
