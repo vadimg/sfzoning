@@ -25,13 +25,21 @@ for o in l:
 
 all_area = sum(home_areas.itervalues())
 
+apt_illegal_pct = 0
+apt5_illegal_pct = 0
 dat = []
 for m in sorted(home_areas.keys()):
+    percentage = 100.0 * home_areas[m] / all_area
     dat.append({
         "homes": m,
-        "percentage": 100.0 * home_areas[m] / all_area,
+        "percentage": percentage,
         "color": color(m),
     })
+
+    if m <= 2:
+        apt_illegal_pct += percentage
+    if m <= 5:
+        apt5_illegal_pct += percentage
 
     if m > 20:
         # the rest will be labeled "> 20"
@@ -44,3 +52,6 @@ print json.dumps(dat, indent=2)
 
 with open('generated/res2.geojson', 'w') as f:
     json.dump(obj, f)
+
+print 'Illegal to build apartment building in %s%% of SF' % round(apt_illegal_pct, 1)
+print 'Illegal to build building with > 5 units in %s%% of SF' % round(apt5_illegal_pct, 1)
