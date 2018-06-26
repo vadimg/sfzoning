@@ -120,6 +120,10 @@ AVG_APT_SIZE = 800.0
 
 
 def units_per_density_limit(zone):
+    if '-OS' in zone:
+        # a special open space zone
+        return -1
+
     fixed = {
         'P': -1,  # parks are < 0
         'RH-1(D)': 2.0 * (LOT_SIZE_PER / 4000),  # minimum lot size 4000 sq ft
