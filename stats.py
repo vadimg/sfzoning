@@ -1,4 +1,5 @@
 import json
+from collections import defaultdict
 from shapely.geometry import shape
 
 from calc import units_per_density_limit, units_per_height, color
@@ -6,7 +7,7 @@ from calc import units_per_density_limit, units_per_height, color
 with open('generated/res.geojson') as f:
     obj = json.load(f)
 
-home_areas = {}
+home_areas = defaultdict(int)
 l = obj['features']
 for o in l:
     coords = o['geometry']['coordinates']
@@ -20,8 +21,7 @@ for o in l:
     prop['homes_zoning'] = homes_zoning
     prop['homes_height'] = homes_height
     prop['fill'] = color(homes)
-    home_areas.setdefault(homes, 0)
-    home_areas[homes] += polygon.area
+    home_areas[int(homes)] += polygon.area
 
 all_area = sum(home_areas.itervalues())
 

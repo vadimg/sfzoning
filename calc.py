@@ -159,32 +159,29 @@ def units_per_height(height_code, height_num):
 COLORS = """
 -1	gray
 0	#3b0000
-0.625	#6d0003
-1.25	#950004
+1	#950004
 2	#c60003
-2.5	#ff0000
 3	#ff6e00
-3.125	#ff8300
-4.166666667	#ffbb00
+4	#ffbb00
 5	#ffff00
-6.25	#deec00
-7.5	#bed900
+6	#deec00
+7	#bed900
 10	#9ec500
-12.5	#7eb100
+12	#7eb100
 15	#609e00
-17.5	#428c00
+17	#428c00
 20	#207700
-22.5	#006400
+22	#006400
 """
 
 colors = {}
 for l in COLORS.split('\n'):
     if l.strip():
         units, color = l.split('\t')
-        colors[int(1000*float(units))] = color
+        colors[int(units)] = color
 
 
 def color(units):
     if units > 20:
-        return colors[int(22.5*1000)]
-    return colors[int(units*1000)]
+        return colors[max(colors.iterkeys())]
+    return colors[int(units)]
