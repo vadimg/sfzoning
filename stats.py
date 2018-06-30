@@ -4,7 +4,7 @@ from shapely.geometry import shape
 
 from calc import units_per_density_limit, units_per_height, color
 
-with open('generated/res.geojson') as f:
+with open('generated/zoning_height.geojson') as f:
     obj = json.load(f)
 
 home_areas = defaultdict(int)
@@ -50,7 +50,7 @@ dat[-1]['percentage'] = 100 - total_percent
 
 print json.dumps(dat, indent=2)
 
-with open('generated/res2.geojson', 'w') as f:
+with open('generated/density_map.geojson', 'w') as f:
     json.dump(obj, f)
 
 print 'Illegal to build apartment building in %s%% of SF' % round(apt_illegal_pct, 1)

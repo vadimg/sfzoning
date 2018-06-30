@@ -63,5 +63,5 @@ for r in res:
         geometry=shapely.geometry.geo.mapping(r.polygon),
     ))
 
-with open('generated/res.geojson', 'w') as f:
+with open('generated/zoning_height.geojson', 'w') as f:
     json.dump(dict(type='FeatureCollection', features=obj), f)
