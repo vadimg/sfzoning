@@ -1,1 +1,3 @@
+pyproj==1.9.5.1
 Shapely==1.6.4.post1
+ujson==1.35

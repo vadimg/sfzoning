@@ -66,12 +66,12 @@ NCT-VALENCIA	0
 NCT-1	0
 NCT-2	0
 NCT-3	0
-C-2	1.00E+09
-C-3-G	1.00E+09
-C-3-O	1.00E+09
-C-3-O(SD)	1.00E+09
-C-3-R	1.00E+09
-C-3-S	1.00E+09
+C-2	800
+C-3-G	125
+C-3-O	125
+C-3-O(SD)	125
+C-3-R	125
+C-3-S	125
 M-1	1.00E+09
 M-2	1.00E+09
 PDR-1-B	1.00E+09
@@ -115,18 +115,18 @@ for l in ZONING.split('\n'):
         lot_size_per_unit[code] = float(numstring)
 
 
-LOT_SIZE_PER = 2500.0
+LOT_SIZE = 2500.0
 AVG_APT_SIZE = 800.0
 
 
-def units_per_density_limit(zone):
+def units_per_density_limit(zone, lot_size=LOT_SIZE, per_lot_size=True):
     if '-OS' in zone:
         # a special open space zone
         return -1
 
     fixed = {
         'P': -1,  # parks are < 0
-        'RH-1(D)': 2.0 * (LOT_SIZE_PER / 4000),  # minimum lot size 4000 sq ft
+        'RH-1(D)': 2.0 * ((lot_size / 4000) if per_lot_size else 1),  # minimum lot size 4000 sq ft
         'RH-1': 2,
         'RH-1(S)': 2,
         'RH-2': 2,
@@ -136,20 +136,20 @@ def units_per_density_limit(zone):
     if n is not None:
         return n
 
-    lot_size = lot_size_per_unit[zone]
+    lot_size_per = lot_size_per_unit[zone]
 
-    if lot_size > 1e6:
+    if lot_size_per > 1e6:
         return 0
-    if lot_size == 0:
+    if lot_size_per == 0:
         return 1e9
-    return LOT_SIZE_PER / lot_size
+    return lot_size / lot_size_per
 
 
-def units_per_height(height_code, height_num):
+def units_per_height(height_code, height_num, lot_size=LOT_SIZE):
     if 'OS' in height_code:
         return -1
 
-    sq_ft = LOT_SIZE_PER * .8  # 80% efficiency
+    sq_ft = lot_size * .8  # 80% efficiency
 
     apts_per_floor = sq_ft / AVG_APT_SIZE
     floors = math.floor(height_num / 10.0)
@@ -182,6 +182,12 @@ for l in COLORS.split('\n'):
 
 
 def color(units):
+    units = int(units)
     if units > 20:
         return colors[max(colors.iterkeys())]
-    return colors[int(units)]
+
+    while True:
+        ret = colors.get(units)
+        if ret is not None:
+            return ret
+        units -= 1
