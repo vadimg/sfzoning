@@ -1,0 +1,258 @@
+<html>
+<head>
+<script src="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
+<link href="https://www.mapbox.com/base/latest/base.css" rel="stylesheet" />
+<style>
+
+#loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0,0,0,0.33);
+}
+
+h1, h2 {
+  background-color: #EBE7E1;
+  text-align: center;
+}
+
+#container {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-flow: column;
+}
+
+#map {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: auto;
+}
+
+.mapboxgl-popup {
+  max-width: 400px;
+  font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.legend {
+  background-color: #fff;
+  border-radius: 3px;
+  bottom: 30px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+  padding: 10px;
+  position: absolute;
+  right: 10px;
+  z-index: 1;
+  width: 300px;
+}
+
+.legend h3 {
+  margin: 0;
+  text-align: center;
+}
+
+.legend h5 {
+  margin: -3px 0 10px;
+  text-align: center;
+  font-size: 10px;
+}
+
+.legend .legend-item {
+  display: block;
+  margin-top: 5px;
+}
+
+.legend-item span {
+  vertical-align: top;
+}
+
+.legend-item .percentage {
+  width: 50px;
+  text-align: right;
+  display: inline-block;
+  font-size: 10px;
+  color: lightgray;
+}
+
+.legend .color-box {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  margin-right: 5px;
+  opacity: 0.7;
+}
+
+.legend .section {
+  margin-top: 10px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.legend .color-explanation {
+  margin-bottom: 10px;
+}
+.legend .color-explanation p {
+  margin: -5px 0;
+}
+
+.legend .fineprint p {
+  font-size: 10px;
+  color: gray;
+  margin: 5px 0;
+  line-height: 10px;
+}
+</style>
+</head>
+<body>
+
+<div id="container">
+  <div id="map">
+    <div id="loader">
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="80px" height="80px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
+        <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
+        s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
+        c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z" />
+        <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
+        C22.32,8.481,24.301,9.057,26.013,10.047z">
+        <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="0.5s" repeatCount="indefinite" />
+        </path>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- templates -->
+<div style="display: none">
+  <div id="popup-template">
+    <h4>Details:</h4>
+    <ul class="list-group">
+      <li class="list-group-item"><b>Available units (normalized): {{ avail_norm }}</b></li>
+      <li class="list-group-item"><b>Available units: {{ avail }}</b></li>
+      <li class="list-group-item">Zoning code: {{ zcode }}</li>
+      <li class="list-group-item">Height code: {{ hcode }}</li>
+      <li class="list-group-item">Address: {{ address }}</li>
+      <li class="list-group-item">Area: {{ area }}</li>
+      <li class="list-group-item">Full object: {{ zoning }}</li>
+    </ul>
+  </div>
+</div>
+<!-- end templates -->
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiZGltdmEiLCJhIjoiY2plYzhtMTM5MG5yazJ4bGE0OHZrcHpnZCJ9.u9hqKMLwpq-JHGyhAW2GeQ';
+
+Handlebars.registerHelper('round', function(num, places, options) {
+    if (arguments.length < 3) {
+      throw new Error("Handlebars Helper round needs 2 parameters");
+    }
+    var e = Math.pow(10, places);
+    return Math.round(num*e) / e;
+});
+
+function htmlDecode(input)
+{
+  var doc = new DOMParser().parseFromString(input, "text/html");
+  return doc.documentElement.textContent;
+}
+
+Handlebars.registerHelper('compare', function (lvalue, operator, rvalue, options) {
+
+    var operators, result;
+
+    if (arguments.length < 3) {
+        throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
+    }
+
+    if (options === undefined) {
+        options = rvalue;
+        rvalue = operator;
+        operator = "===";
+    }
+
+    operator = htmlDecode(operator);
+
+    operators = {
+        '==': function (l, r) { return l == r; },
+        '===': function (l, r) { return l === r; },
+        '!=': function (l, r) { return l != r; },
+        '!==': function (l, r) { return l !== r; },
+        '<': function (l, r) { return l < r; },
+        '>': function (l, r) { return l > r; },
+        '<=': function (l, r) { return l <= r; },
+        '>=': function (l, r) { return l >= r; },
+        'typeof': function (l, r) { return typeof l == r; }
+    };
+
+    if (!operators[operator]) {
+        throw new Error("Handlerbars Helper 'compare' doesn't know the operator " + operator);
+    }
+
+    result = operators[operator](lvalue, rvalue);
+
+    if (result) {
+        return options.fn(this);
+    } else {
+        return options.inverse(this);
+    }
+
+});
+
+var map = new mapboxgl.Map({
+    container: 'map', // container id
+    style: 'mapbox://styles/mapbox/dark-v9',
+    center: [-122.42936665634733, 37.75967613988033], // starting position
+    zoom: 11.75 // starting zoom
+});
+
+// Hide loading bar once tiles from geojson are loaded
+map.on('data', function(e) {
+    if (e.dataType === 'source' && e.sourceId === 'zones-layer') {
+        document.getElementById("loader").style.display = "none";
+    }
+});
+
+// disable map rotation using right click + drag
+map.dragRotate.disable();
+
+// disable map rotation using touch rotation gesture
+map.touchZoomRotate.disableRotation();
+
+// Add zoom and rotation controls to the map.
+map.addControl(new mapboxgl.NavigationControl({showCompass: false}));
+
+var popupTemplate = Handlebars.compile(document.getElementById("popup-template").innerHTML);
+
+map.on('load', function () {
+  map.addLayer({
+      'id': 'zones-layer',
+      'type': 'fill',
+      'source': {
+          'type': 'geojson',
+          'data': 'generated/avail10.geojson'
+      },
+      'paint': {
+          'fill-opacity': 0.7,
+          'fill-color': ['get', 'fill']
+      }
+  });
+
+    // When a click event occurs on a feature in the states layer, open a popup at the
+    // location of the click, with description HTML from its properties.
+    map.on('click', 'zones-layer', function (e) {
+      var prop = e.features[0].properties;
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(popupTemplate(prop))
+            .addTo(map);
+    });
+});
+
+</script>
+</body>
+</html>
