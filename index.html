@@ -61,7 +61,20 @@ h1, h2 {
   position: absolute;
   right: 10px;
   z-index: 1;
-  width: 300px;
+  width: 305px;
+  max-height: 550px;
+  overflow: auto;
+}
+
+/* force a scrollbar to always appear */
+.legend::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+}
+.legend::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0,0,0,.5);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
 }
 
 .legend h3 {
@@ -119,6 +132,7 @@ h1, h2 {
   margin: 5px 0;
   line-height: 10px;
 }
+
 </style>
 </head>
 <body>
@@ -150,7 +164,7 @@ h1, h2 {
       <p>"Apartment building" is defined to be a building with 3 or more homes. It is illegal to build a building with more than 5 homes in 87% of San Francisco.
       <p>2,500 sq ft is a typical lot size in San Francisco
       <p>Assumes 2.5 apartments per 10 ft of height per 2,500 sq ft
-      <p>Calculations include <a href="http://sf-planning.org/accessory-dwelling-units" target="_blank">waiverless ADUs</a>
+      <p>Calculations include <a href="http://sf-planning.org/accessory-dwelling-units" target="_blank">waiverless ADUs</a> and <a href="http://library.amlegal.com/nxt/gateway.dll/California/planning/article12dimensionsareasandopenspaces?f=templates$fn=default.htm$3.0$vid=amlegal:sanfrancisco_ca$anc=JD_145.4">ground-floor retail requirements</a>
       <p>Many apartment buildings already exist in the red and orange areas but would be illegal to build today
       <p>You can see why new development is concentrated in the Mission, Soma, and Tenderloin neighborhoods
       <p>Data from <a href="http://propertymap.sfplanning.org/" target="_blank">SF gov</a>. Code on <a href="https://github.com/vadimg/sfzoning" target="_blank">Github</a>.
