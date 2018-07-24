@@ -120,7 +120,7 @@ AVG_APT_SIZE = 800.0
 
 GROUND_FLOOR_COMMERCIAL_REQUIRED_PREFIXES = (
     'NCT-',
-    'C-',
+    'C-3-',
 )
 
 
