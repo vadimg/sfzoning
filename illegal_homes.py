@@ -14,6 +14,7 @@ from fileutil import load, dump
 
 
 METER_TO_FEET = 3.280839895
+SQ_METER_TO_SQ_FEET = METER_TO_FEET ** 2
 
 
 def sq_ft(geom):
@@ -27,10 +28,7 @@ def sq_ft(geom):
                 lat2=geom.bounds[3])),
         geom)
     projected_area = geom_area.area
-
-    mlen = projected_area ** 0.5
-
-    return (mlen * METER_TO_FEET) ** 2
+    return projected_area * SQ_METER_TO_SQ_FEET
 
 
 def address(prop):
