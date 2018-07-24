@@ -14,7 +14,7 @@ for o in l:
     polygon = shape(o['geometry'])
     prop = o['properties']
     homes_zoning = units_per_density_limit(prop['zoning'])
-    homes_height = units_per_height(prop['height_str'], prop['height'])
+    homes_height = units_per_height(prop['height_str'], prop['height'], prop['zoning'])
     homes = min(homes_zoning, homes_height)
     t = (homes_zoning, homes_height, homes, prop['height_str'])
     prop['homes'] = homes

@@ -118,6 +118,11 @@ for l in ZONING.split('\n'):
 LOT_SIZE = 2500.0
 AVG_APT_SIZE = 800.0
 
+GROUND_FLOOR_COMMERCIAL_REQUIRED_PREFIXES = (
+    'NCT-',
+    'C-',
+)
+
 
 def units_per_density_limit(zone, lot_size=LOT_SIZE, per_lot_size=True):
     if '-OS' in zone:
@@ -145,7 +150,7 @@ def units_per_density_limit(zone, lot_size=LOT_SIZE, per_lot_size=True):
     return lot_size / lot_size_per
 
 
-def units_per_height(height_code, height_num, lot_size=LOT_SIZE):
+def units_per_height(height_code, height_num, zoning, lot_size=LOT_SIZE):
     if 'OS' in height_code:
         return -1
 
@@ -153,6 +158,11 @@ def units_per_height(height_code, height_num, lot_size=LOT_SIZE):
 
     apts_per_floor = sq_ft / AVG_APT_SIZE
     floors = math.floor(height_num / 10.0)
+
+    for prefix in GROUND_FLOOR_COMMERCIAL_REQUIRED_PREFIXES:
+        if zoning.startswith(prefix):
+            floors -= 1
+            break
 
     return apts_per_floor * floors
 

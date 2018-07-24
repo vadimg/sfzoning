@@ -31,7 +31,7 @@ def main():
         area = sq_ft(s)
 
         units_density = units_per_density_limit(zoning['zoning'], lot_size=area, per_lot_size=False)
-        units_height = units_per_height(zoning['height_str'], zoning['height'], area)
+        units_height = units_per_height(zoning['height_str'], zoning['height'], zoning['zoning'], lot_size=area)
 
         if units_density < 0 or units_height < 0:
             continue
