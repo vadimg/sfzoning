@@ -1,3 +1,4 @@
+import shapely
 import ujson
 
 
@@ -10,3 +11,11 @@ def load(filename):
     with open(filename) as f:
         obj = ujson.load(f)
     return obj['features']
+
+
+def poly2feature(polygon):
+    return dict(
+        type='Feature',
+        properties={},
+        geometry=shapely.geometry.geo.mapping(polygon),
+    )
