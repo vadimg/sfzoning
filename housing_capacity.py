@@ -44,7 +44,7 @@ def main():
 
         avail = int(reg_units) - units
 
-        avail_norm = avail * 2500.0 / area
+        avail_norm = avail * 2500.0 / max(area, 2500)
         if avail_norm <= 5:
             continue
 
