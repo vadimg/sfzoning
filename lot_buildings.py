@@ -37,7 +37,7 @@ def main():
             if intersect.is_empty:
                 continue
 
-            intersects.append((lot.data['properties'], intersect.area))
+            intersects.append((lot.data, intersect.area))
 
         if not intersects:
             print 'LOT NOT FOUND', obj
@@ -46,11 +46,11 @@ def main():
 
         print len(intersects)
         if len(intersects) != 1:
-            multiple_found.extend(intersects)
+            multiple_found.extend([x[0] for x in intersects])
             multiple_found.append(lot.data)
 
         max_i = max(intersects, key=lambda x: x[1])
-        max_i[0].setdefault('buildings', []).append(obj)
+        max_i[0]['properties'].setdefault('buildings', []).append(obj)
 
 
     dumpall()
