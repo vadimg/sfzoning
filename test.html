@@ -133,11 +133,14 @@ h1, h2 {
     <h4>Details:</h4>
     <ul class="list-group">
       <li class="list-group-item"><b>Available units (normalized): {{ avail_norm }}</b></li>
+      <li class="list-group-item">Resunits: {{ resunits }}</li>
+      <li class="list-group-item">Land use: {{ landuse }}</li>
+      <li class="list-group-item">Max building height: {{ max_building_height }}</li>
       <li class="list-group-item"><b>Available units: {{ avail }}</b></li>
       <li class="list-group-item">Zoning code: {{ zcode }}</li>
       <li class="list-group-item">Height code: {{ hcode }}</li>
       <li class="list-group-item">Address: {{ address }}</li>
-      <li class="list-group-item">Area: {{ area }}</li>
+      <li class="list-group-item">Area: {{ sqft }}</li>
       <li class="list-group-item">Full object: {{ zoning }}</li>
     </ul>
   </div>
@@ -234,7 +237,7 @@ map.on('load', function () {
       'type': 'fill',
       'source': {
           'type': 'geojson',
-          'data': 'generated/avail10.geojson'
+          'data': 'generated/affordable.geojson'
       },
       'paint': {
           'fill-opacity': 0.7,

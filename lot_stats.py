@@ -1,5 +1,3 @@
-import ujson
-
 from shapely.geometry import shape
 
 from results import Results
@@ -9,7 +7,7 @@ from fileutil import load, dump
 
 
 def main():
-    features = load('generated/building_zoning.geojson')
+    features = load('generated/lot_zoning.geojson')
 
     r = Results()
     r.units = 0

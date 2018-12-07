@@ -5,7 +5,7 @@ from polygon_index import PolygonIndex
 
 
 def main():
-    lots = load('generated/building_zoning.geojson')
+    lots = load('generated/lot_zoning.geojson')
 
     index = PolygonIndex()
     for i, obj in enumerate(lots):
@@ -15,12 +15,10 @@ def main():
     buildings = load('data/buildings.geojson')
 
     not_found = []
-    multiple_found = []
 
     def dumpall():
-        dump('generated/lot_buildings_zoning.geojson', lots)
+        dump('generated/lot_building_zoning.geojson', lots)
         dump('generated/building_not_found_for_lot.geojson', not_found)
-        dump('generated/multiple_lots_per_building.geojson', multiple_found)
 
     for i, obj in enumerate(buildings):
         print '%s / %s' % (i + 1, len(buildings))
@@ -46,12 +44,12 @@ def main():
 
         print len(intersects)
         if len(intersects) != 1:
-            multiple_found.extend([x[0] for x in intersects])
-            multiple_found.append(lot.data)
+            for x in intersects:
+                if poly.area:
+                    print '\t', 100.0 * x[1] / poly.area
 
         max_i = max(intersects, key=lambda x: x[1])
         max_i[0]['properties'].setdefault('buildings', []).append(obj)
-
 
     dumpall()
 

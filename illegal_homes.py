@@ -1,45 +1,11 @@
-import ujson
 import sys
-from collections import namedtuple
-from functools import partial
 
 from shapely.geometry import shape
-from shapely.ops import transform
-import shapely.ops as ops
-import pyproj
 
-from calc import units_per_density_limit, units_per_height
+from calc import units_per_density_limit, units_per_height, sq_ft, address
 from results import Results
 from fileutil import load, dump
 
-
-METER_TO_FEET = 3.280839895
-SQ_METER_TO_SQ_FEET = METER_TO_FEET ** 2
-
-
-def sq_ft(geom):
-    geom_area = ops.transform(
-        partial(
-            pyproj.transform,
-            pyproj.Proj(init='EPSG:4326'),
-            pyproj.Proj(
-                proj='aea',
-                lat1=geom.bounds[1],
-                lat2=geom.bounds[3])),
-        geom)
-    projected_area = geom_area.area
-    return projected_area * SQ_METER_TO_SQ_FEET
-
-
-def address(prop):
-    from_st = prop['from_st']
-    to_st = prop['to_st']
-    number = from_st if from_st == to_st else '%s-%s' % (from_st, to_st)
-    return '%s %s %s' % (
-        number,
-        prop['street'],
-        prop['st_type'],
-    )
 
 def main():
     filename = sys.argv[1]

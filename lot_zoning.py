@@ -1,6 +1,7 @@
 from shapely.geometry import shape
 
 from fileutil import load, dump
+from calc import sq_ft, address
 from polygon_index import PolygonIndex
 
 
@@ -26,6 +27,9 @@ def main():
         lot_poly = shape(obj['geometry'])
         intersecting = index.intersecting(lot_poly)
 
+        obj['properties']['address'] = address(obj['properties'])
+        obj['properties']['sqft'] = sq_ft(lot_poly)
+
         intersects = []
         for zone in intersecting:
             intersect = lot_poly.intersection(zone.polygon)
@@ -45,7 +49,6 @@ def main():
         obj['properties']['zoning'] = max_i[0]
 
         lot_zoning.append(obj)
-
 
     dump('generated/lot_zoning.geojson', lot_zoning)
     dump('generated/zone_not_found_for_lot.geojson', not_found)
