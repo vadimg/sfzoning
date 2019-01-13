@@ -10,7 +10,7 @@ def main():
 
     index = PolygonIndex()
     for i, obj in enumerate(zones):
-        print '%s / %s' % (i + 1, len(zones))
+        print('%s / %s' % (i + 1, len(zones)))
         index.add_obj(obj)
 
     lots = load('data/lots.geojson')
@@ -18,7 +18,7 @@ def main():
     lot_zoning = []
     not_found = []
     for i, obj in enumerate(lots):
-        print '%s / %s' % (i + 1, len(lots))
+        print('%s / %s' % (i + 1, len(lots)))
 
         if i % 10000 == 0:
             dump('generated/lot_zoning.geojson', lot_zoning)
@@ -40,12 +40,12 @@ def main():
 
         if not intersects:
             # this is probably a vacant thingy
-            print 'ZONE NOT FOUND', obj
+            print('ZONE NOT FOUND', obj)
             not_found.append(obj)
             continue
 
         max_i = max(intersects, key=lambda x: x[1])
-        print max_i[0]['homes'], obj['properties']['resunits']
+        print(max_i[0]['homes'], obj['properties']['resunits'])
         obj['properties']['zoning'] = max_i[0]
 
         lot_zoning.append(obj)

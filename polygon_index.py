@@ -65,6 +65,22 @@ class PolygonIndex(object):
         for sq in sqs:
             self._index.setdefault(sq.bounds, []).append(self.MapValue(polygon=polygon, data=data))
 
+    def containing_point(self, point):
+        ret = {}
+        sqs = squares(roundpoint(point))
+
+        for sq in sqs:
+            others = self._index.get(sq.bounds, [])
+            for val in others:
+                wkt = val.polygon.wkt
+                if wkt in ret:
+                    continue
+
+                if val.polygon.contains(point):
+                    ret[wkt] = val
+
+        return ret.values()
+
     def intersecting(self, polygon):
         ret = {}
 
