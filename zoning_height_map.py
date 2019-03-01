@@ -8,7 +8,7 @@ Zone = namedtuple('Zone', 'polygon zoning zoning_sim index')
 
 with open('data/zoning.geojson') as f:
     obj = json.load(f)
-    print obj['features'][0]['properties']['zoning']
+    print(obj['features'][0]['properties']['zoning'])
 
 zones = []
 for i, o in enumerate(obj['features']):
@@ -22,16 +22,16 @@ for i, o in enumerate(obj['features']):
 
 with open('data/height.geojson') as f:
     obj = json.load(f)
-    print obj['features'][100]['properties']['gen_hght']
+    print(obj['features'][100]['properties']['gen_hght'])
 
-print 'loaded'
+print('loaded')
 
 Result = namedtuple('Result', 'polygon properties')
 Intersect = namedtuple('Intersect', 'zoning area')
 
 res = []
 for i, o in enumerate(obj['features']):
-    print i, '/', len(obj['features'])
+    print(i, '/', len(obj['features']))
     height = int(o['properties']['gen_hght'])
     height_str = o['properties']['height']
     p = shape(o['geometry'])

@@ -60,7 +60,7 @@ dat[-1]['percentage'] = 100 - total_percent
 
 print(json.dumps(dat, indent=2))
 
-with open('generated/affordable.geojson', 'w') as f:
+with open('generated/density_map.geojson', 'w') as f:
     json.dump(obj, f)
 
 print('Illegal to build apartment building in %s%% of SF' % round(apt_illegal_pct, 1))

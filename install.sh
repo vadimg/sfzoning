@@ -1,6 +1,6 @@
 #!/bin/bash
 
-virtualenv ENV
+python3 -m venv
 . ENV/bin/activate
 
 pip install -r requirements.txt

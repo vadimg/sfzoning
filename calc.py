@@ -111,6 +111,8 @@ YBI-R	0
 YBI-OS	1.00E+09
 YBI-PCI	1.00E+09
 MR-MU	0
+CMUO	0
+P70-MU	0
 P	1.00E+09
 """
 
@@ -201,7 +203,7 @@ for l in COLORS.split('\n'):
 def color(units):
     units = int(units)
     if units > 20:
-        return colors[max(colors.iterkeys())]
+        return colors[max(colors.keys())]
 
     while True:
         ret = colors.get(units)
