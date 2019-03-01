@@ -13,7 +13,7 @@ Run `./install.sh`
 **Make sure you are in the virtualenv by running `. ENV/bin/activate`**
 
 * `python zoning_height_map.py` to generate `generated/zoning_height.geojson`
-* `python stats.py` to generate `generated/zoning_height.geojson`
+* `python stats.py` to generate `generated/density_map.geojson`
 
 # View Map
 
