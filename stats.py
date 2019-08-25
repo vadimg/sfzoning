@@ -58,7 +58,12 @@ for m in sorted(home_areas.keys()):
 total_percent = sum(x['percentage'] for x in dat)
 dat[-1]['percentage'] = 100 - total_percent
 
-print(json.dumps(dat, indent=2))
+with open('generated/key_data.json', 'w') as f:
+    json.dump(dict(
+        key=dat,
+        apt_illegal_pct=apt_illegal_pct,
+        apt5_illegal_pct=apt5_illegal_pct,
+    ), f)
 
 with open('generated/density_map.geojson', 'w') as f:
     json.dump(obj, f)
