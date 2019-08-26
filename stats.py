@@ -1,22 +1,14 @@
 import json
-from collections import defaultdict
-from shapely.geometry import shape
 
 from calc.sf import units_per_density_limit, units_per_height
-import pdb; pdb.set_trace()  # XXX BREAKPOINT
-from calc import color
+from calc import color, key_stats
 
 with open('generated/zoning_height.geojson') as f:
     obj = json.load(f)
 
-affordable_sqft = 0
-residential_sqft = 0
-
-home_areas = defaultdict(int)
 l = obj['features']
 for o in l:
     coords = o['geometry']['coordinates']
-    polygon = shape(o['geometry'])
     prop = o['properties']
     homes_zoning = units_per_density_limit(prop['zoning'])
     homes_height = units_per_height(prop['height_str'], prop['height'], prop['zoning'])
@@ -26,52 +18,19 @@ for o in l:
     prop['homes_zoning'] = homes_zoning
     prop['homes_height'] = homes_height
     prop['fill'] = color(homes)
-    area = polygon.area
 
-    if homes > 0:
-        residential_sqft += area
-    if homes >= 12.5:
-        affordable_sqft += area
 
-    home_areas[int(homes)] += area
-
-all_area = sum(home_areas.values())
-
-apt_illegal_pct = 0
-apt5_illegal_pct = 0
-dat = []
-for m in sorted(home_areas.keys()):
-    percentage = 100.0 * home_areas[m] / all_area
-    dat.append({
-        "homes": m,
-        "percentage": percentage,
-        "color": color(m),
-    })
-
-    if m <= 2:
-        apt_illegal_pct += percentage
-    if m <= 5:
-        apt5_illegal_pct += percentage
-
-    if m > 20:
-        # the rest will be labeled "> 20"
-        break
-
-total_percent = sum(x['percentage'] for x in dat)
-dat[-1]['percentage'] = 100 - total_percent
+stats = key_stats(l)
 
 with open('generated/key_data.json', 'w') as f:
-    json.dump(dict(
-        key=dat,
-        apt_illegal_pct=apt_illegal_pct,
-        apt5_illegal_pct=apt5_illegal_pct,
-    ), f)
+    json.dump(stats, f)
 
 with open('generated/density_map.geojson', 'w') as f:
     json.dump(obj, f)
 
-print('Illegal to build apartment building in %s%% of SF' % round(apt_illegal_pct, 1))
-print('Illegal to build building with > 5 units in %s%% of SF' % round(apt5_illegal_pct, 1))
+print('Illegal to build apartment building in %s%% of SF' % round(stats['apt_illegal_pct'], 1))
+print('Illegal to build building with > 5 units in %s%% of SF' % round(stats['apt5_illegal_pct'], 1))
 print('Illegal to build affordable housing in %s%% of SF land zoned for residential' %
-      round(100 - 100 * affordable_sqft / residential_sqft, 1))
+      round(stats['affordable_illegal_resi_pct'], 1))
+print('Illegal to build affordable housing in %s%% of SF' % round(stats['affordable_illegal_pct'], 1))
 

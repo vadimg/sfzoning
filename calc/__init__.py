@@ -1,4 +1,6 @@
 import functools
+from collections import defaultdict
+from shapely.geometry import shape
 
 import shapely.ops as ops
 import pyproj
@@ -55,3 +57,56 @@ def sq_ft(geom):
         geom)
     projected_area = geom_area.area
     return projected_area * SQ_METER_TO_SQ_FEET
+
+
+def key_stats(features):
+    affordable_sqft = 0
+    residential_sqft = 0
+
+    home_areas = defaultdict(int)
+    for o in features:
+        polygon = shape(o['geometry'])
+        area = polygon.area
+        homes = o['properties']['homes']
+
+        if homes > 0:
+            residential_sqft += area
+        if homes >= 12.5:
+            affordable_sqft += area
+
+        home_areas[int(homes)] += area
+
+    non_os_area = sum(v for k, v in home_areas.items() if k >= 0)
+    all_area = sum(home_areas.values())
+
+    apt_illegal_area = 0
+    apt5_illegal_area = 0
+    dat = []
+    for m in sorted(home_areas.keys()):
+        percentage = 100.0 * home_areas[m] / all_area
+        dat.append({
+            "homes": m,
+            "percentage": percentage,
+            "color": color(m),
+        })
+
+        if m >= 0:
+            if m <= 2:
+                apt_illegal_area += home_areas[m]
+            if m <= 5:
+                apt5_illegal_area += home_areas[m]
+
+        if m > 20:
+            # the rest will be labeled "> 20"
+            break
+
+    total_percent = sum(x['percentage'] for x in dat)
+    dat[-1]['percentage'] = 100 - total_percent
+
+    return dict(
+        key=dat,
+        apt_illegal_pct=100 * apt_illegal_area / non_os_area,
+        apt5_illegal_pct=100 * apt5_illegal_area / non_os_area,
+        affordable_illegal_resi_pct=100 - 100 * affordable_sqft / residential_sqft,
+        affordable_illegal_pct=100 - 100 * affordable_sqft / non_os_area,
+    )

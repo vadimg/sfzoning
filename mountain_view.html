@@ -289,8 +289,8 @@ Handlebars.registerHelper('compare', function (lvalue, operator, rvalue, options
 var map = new mapboxgl.Map({
     container: 'map', // container id
     style: 'mapbox://styles/mapbox/streets-v9',
-    center: [-122.42936665634733, 37.75967613988033], // starting position
-    zoom: 11.75 // starting zoom
+    center: [-122.0637322335084, 37.39644593970458], // starting position
+    zoom: 12 // starting zoom
 });
 
 // Hide loading bar once tiles from geojson are loaded
@@ -322,7 +322,7 @@ var legendItemTemplate = Handlebars.compile(document.getElementById("legend-item
 var fineprintTemplate = Handlebars.compile(document.getElementById("fineprint-template").innerHTML);
 var headerTemplate = Handlebars.compile(document.getElementById("header-template").innerHTML);
 
-$.getJSON('generated/key_data.json', function(keyData) {
+$.getJSON('generated/key_data.mountain_view.json', function(keyData) {
   document.getElementById('header').insertAdjacentHTML('beforeend', headerTemplate({
         apt_illegal_pct: keyData.apt_illegal_pct,
   }));
