@@ -2,7 +2,9 @@ import json
 from collections import defaultdict
 from shapely.geometry import shape
 
-from calc import units_per_density_limit, units_per_height, color
+from calc.sf import units_per_density_limit, units_per_height
+import pdb; pdb.set_trace()  # XXX BREAKPOINT
+from calc import color
 
 with open('generated/zoning_height.geojson') as f:
     obj = json.load(f)

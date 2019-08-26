@@ -2,7 +2,8 @@ import sys
 
 from shapely.geometry import shape
 
-from calc import units_per_density_limit, units_per_height, sq_ft, address
+from calc.sf import units_per_density_limit, units_per_height, address
+from calc import sq_ft
 from results import Results
 from fileutil import load, dump
 

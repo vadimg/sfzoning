@@ -1,5 +1,5 @@
 import json
-from calc import units_per_density_limit
+from calc.sf import units_per_density_limit
 
 with open('generated/zoning_height.geojson') as f:
     obj = json.load(f)

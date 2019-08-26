@@ -1,7 +1,8 @@
 from calc import color
 from collections import defaultdict
 
-from calc import units_per_density_limit, units_per_height, METER_TO_FEET
+from calc import METER_TO_FEET
+from calc.sf import units_per_density_limit, units_per_height
 from results import Results
 from fileutil import load, dump
 
