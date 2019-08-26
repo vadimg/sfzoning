@@ -21,6 +21,8 @@ for o in l:
 
 
 stats = key_stats(l)
+stats['sqft'] = '2,500'
+stats['city'] = 'San Francisco'
 
 with open('generated/key_data.json', 'w') as f:
     json.dump(stats, f)

@@ -34,6 +34,8 @@ for o in obj['features']:
     print(zoning, round(min(homes_density, homes_height), 1))
 
 stats = key_stats(obj['features'])
+stats['sqft'] = '8,000'
+stats['city'] = 'Mountain View'
 
 with open('generated/key_data.mountain_view.json', 'w') as f:
     json.dump(stats, f)

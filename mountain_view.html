@@ -152,9 +152,14 @@ h1, h2 {
       </svg>
     </div>
   </div>
-  <div class="legend">
+  <div id="legend" class="legend"></div>
+</div>
+
+<!-- templates -->
+<div style="display: none">
+  <div id="legend-template">
     <h3>Max. Allowed Homes</h3>
-    <h5>(per 2,500 sq ft plot of land)</h5>
+    <h5>(per {{ sqft }} sq ft plot of land)</h5>
     <div class="section color-explanation">
       <p><strong style="color: red">Red</strong> means single-family or duplexes only
       <p><strong style="color: orange">Orange</strong> means triplexes or fourplexes are legal
@@ -163,19 +168,19 @@ h1, h2 {
     <div id="legend-data"></div>
     <div class="fineprint section" id="fineprint"></div>
   </div>
-</div>
 
-<!-- templates -->
-<div style="display: none">
-  <div id="header-template">Apartment buildings are illegal to build in {{ round apt_illegal_pct 0 }}% of San Francisco</div>
+  <div id="header-template">Apartment buildings are illegal to build in {{ round apt_illegal_pct 0 }}% of {{ city }}</div>
   <div id="fineprint-template">
-    <p>"Apartment building" is defined to be a building with 3 or more homes. It is illegal to build a building with more than 5 homes in {{ round apt5_illegal_pct 0 }}% of San Francisco.
-    <p>2,500 sq ft is a typical lot size in San Francisco
-    <p>Assumes 2.5 apartments per 10 ft of height per 2,500 sq ft
+    <p>"Apartment building" is defined to be a building with 3 or more homes. It is illegal to build a building with more than 5 homes in {{ round apt5_illegal_pct 0 }}% of {{ city }}.
+    <p>{{ sqft }} sq ft is a typical lot size in {{ city }}
+    <p>Assumes 2.5 apartments per 10 ft of height per {{ sqft }} sq ft
+
+    {{#compare city "==" "San Francisco" }}
     <p>Calculations include <a href="http://sf-planning.org/accessory-dwelling-units" target="_blank">waiverless ADUs</a> and <a href="http://library.amlegal.com/nxt/gateway.dll/California/planning/article12dimensionsareasandopenspaces?f=templates$fn=default.htm$3.0$vid=amlegal:sanfrancisco_ca$anc=JD_145.4">ground-floor retail requirements</a>
     <p>Many apartment buildings already exist in the red and orange areas but would be illegal to build today
     <p>You can see why new development is concentrated in the Mission, Soma, and Tenderloin neighborhoods
     <p>Data from <a href="http://propertymap.sfplanning.org/" target="_blank">SF gov</a>. Code on <a href="https://github.com/vadimg/sfzoning" target="_blank">Github</a>.
+    {{/compare}}
   </div>
   <div id="popup-template">
     <h4>Details:</h4>
@@ -317,17 +322,26 @@ map.addControl(new mapboxgl.GeolocateControl({
     trackUserLocation: true
 }));
 
+var legendTemplate = Handlebars.compile(document.getElementById("legend-template").innerHTML);
 var popupTemplate = Handlebars.compile(document.getElementById("popup-template").innerHTML);
 var legendItemTemplate = Handlebars.compile(document.getElementById("legend-item-template").innerHTML);
 var fineprintTemplate = Handlebars.compile(document.getElementById("fineprint-template").innerHTML);
 var headerTemplate = Handlebars.compile(document.getElementById("header-template").innerHTML);
 
 $.getJSON('generated/key_data.mountain_view.json', function(keyData) {
+  document.getElementById('legend').insertAdjacentHTML('beforeend', legendTemplate({
+        sqft: keyData.sqft,
+        city: keyData.city,
+  }));
   document.getElementById('header').insertAdjacentHTML('beforeend', headerTemplate({
+        sqft: keyData.sqft,
         apt_illegal_pct: keyData.apt_illegal_pct,
+        city: keyData.city,
   }));
   document.getElementById('fineprint').insertAdjacentHTML('beforeend', fineprintTemplate({
+        sqft: keyData.sqft,
         apt5_illegal_pct: keyData.apt5_illegal_pct,
+        city: keyData.city,
   }));
 
   map.on('load', function () {
