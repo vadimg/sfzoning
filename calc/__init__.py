@@ -59,7 +59,7 @@ def sq_ft(geom):
     return projected_area * SQ_METER_TO_SQ_FEET
 
 
-def key_stats(features):
+def key_stats(features, lot_size):
     affordable_sqft = 0
     residential_sqft = 0
 
@@ -71,7 +71,7 @@ def key_stats(features):
 
         if homes > 0:
             residential_sqft += area
-        if homes >= 12.5:
+        if homes >= 50 / (10e3 / lot_size):
             affordable_sqft += area
 
         home_areas[int(homes)] += area
@@ -100,10 +100,11 @@ def key_stats(features):
             # the rest will be labeled "> 20"
             break
 
-    total_percent = sum(x['percentage'] for x in dat)
+    total_percent = sum(x['percentage'] for x in dat[:-1])
     dat[-1]['percentage'] = 100 - total_percent
 
     return dict(
+        lot_size=lot_size,
         key=dat,
         apt_illegal_pct=100 * apt_illegal_area / non_os_area,
         apt5_illegal_pct=100 * apt5_illegal_area / non_os_area,
