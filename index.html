@@ -3,11 +3,15 @@
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120785721-1"></script>
 <script>
+  var cityCode = window.location.hash.substr(1) || 'sf';
+
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
   gtag('config', 'UA-120785721-1');
+  gtag('config', 'GA_MEASUREMENT_ID', {'page_path': '/' + cityCode});
+
 </script>
 
 <title>Zoning Laws Make It Illegal To Build Apartments In Most Of The City</title>
@@ -343,7 +347,6 @@ var legendItemTemplate = Handlebars.compile(document.getElementById("legend-item
 var fineprintTemplate = Handlebars.compile(document.getElementById("fineprint-template").innerHTML);
 var headerTemplate = Handlebars.compile(document.getElementById("header-template").innerHTML);
 
-var cityCode = window.location.hash.substr(1) || 'sf';
 window.onhashchange = function() {
   location.reload();
 };
