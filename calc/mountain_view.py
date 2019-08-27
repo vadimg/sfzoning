@@ -30,7 +30,7 @@ for l in ZONING.split('\n'):
         code_data[code] = (float(densitystr), float(heightstr))
 
 
-LOT_SIZE = 2500.0
+LOT_SIZE = 5000.0
 SQ_FT_PER_ACRE = 43560.0
 AVG_APT_SIZE = 800.0
 

@@ -22,6 +22,8 @@ for o in l:
 
 stats = key_stats(l, LOT_SIZE)
 stats['city'] = 'San Francisco'
+stats['center'] = [-122.42936665634733, 37.75967613988033]
+stats['zoom'] = 11.75
 
 with open('generated/key_data.sf.json', 'w') as f:
     json.dump(stats, f)

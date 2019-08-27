@@ -10,7 +10,7 @@
   gtag('config', 'UA-120785721-1');
 </script>
 
-<title>SF Zoning Laws Make It Illegal To Build Apartments In Most Of The City</title>
+<title>Zoning Laws Make It Illegal To Build Apartments In Most Of The City</title>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -152,9 +152,14 @@ h1, h2 {
       </svg>
     </div>
   </div>
-  <div class="legend">
+  <div id="legend" class="legend"></div>
+</div>
+
+<!-- templates -->
+<div style="display: none">
+  <div id="legend-template">
     <h3>Max. Allowed Homes</h3>
-    <h5>(per 2,500 sq ft plot of land)</h5>
+    <h5>(per {{ commas lot_size }} sq ft plot of land)</h5>
     <div class="section color-explanation">
       <p><strong style="color: red">Red</strong> means single-family or duplexes only
       <p><strong style="color: orange">Orange</strong> means triplexes or fourplexes are legal
@@ -163,19 +168,24 @@ h1, h2 {
     <div id="legend-data"></div>
     <div class="fineprint section" id="fineprint"></div>
   </div>
-</div>
 
-<!-- templates -->
-<div style="display: none">
-  <div id="header-template">Apartment buildings are illegal to build in {{ round apt_illegal_pct 0 }}% of San Francisco</div>
+  <div id="header-template">Apartment buildings are illegal to build in {{ round apt_illegal_pct 0 }}% of {{ city }}</div>
   <div id="fineprint-template">
-    <p>"Apartment building" is defined to be a building with 3 or more homes. It is illegal to build a building with more than 5 homes in {{ round apt5_illegal_pct 0 }}% of San Francisco.
-    <p>2,500 sq ft is a typical lot size in San Francisco
-    <p>Assumes 2.5 apartments per 10 ft of height per 2,500 sq ft
+    <p>"Apartment building" is defined to be a building with 3 or more homes. It is illegal to build a building with more than 5 homes in {{ round apt5_illegal_pct 0 }}% of {{ city }}.
+    <p>{{ commas lot_size }} sq ft is a typical lot size in {{ city }}
+
+    {{#compare city "==" "San Francisco" }}
+    <p>Assumes 2.5 apartments per 10 ft of height per {{ commas lot_size }} sq ft
     <p>Calculations include <a href="http://sf-planning.org/accessory-dwelling-units" target="_blank">waiverless ADUs</a> and <a href="http://library.amlegal.com/nxt/gateway.dll/California/planning/article12dimensionsareasandopenspaces?f=templates$fn=default.htm$3.0$vid=amlegal:sanfrancisco_ca$anc=JD_145.4">ground-floor retail requirements</a>
     <p>Many apartment buildings already exist in the red and orange areas but would be illegal to build today
     <p>You can see why new development is concentrated in the Mission, Soma, and Tenderloin neighborhoods
     <p>Data from <a href="http://propertymap.sfplanning.org/" target="_blank">SF gov</a>. Code on <a href="https://github.com/vadimg/sfzoning" target="_blank">Github</a>.
+    {{/compare}}
+
+    {{#compare city "==" "Mountain View" }}
+    <p>Data from <a href="https://data-mountainview.opendata.arcgis.com/datasets/f9aced0c78b446f99d43653512b402d6_0/data?geometry=-122.203%2C37.378%2C-121.956%2C37.426&page=2" target="_blank">City of Mountain View</a>. Code on <a href="https://github.com/vadimg/sfzoning" target="_blank">Github</a>.
+    {{/compare}}
+
   </div>
   <div id="popup-template">
     <h4>Details:</h4>
@@ -190,7 +200,7 @@ h1, h2 {
     {{/compare}}
     {{else}}
     <ul class="list-group">
-      <li class="list-group-item">Homes per 2500 sq ft: {{round homes 3}}</li>
+      <li class="list-group-item">Homes per {{commas lot_size}} sq ft: {{round homes 3}}</li>
       <li class="list-group-item">Max homes due to zoning code:
         {{#compare homes_zoning ">" 10000 }}
         No limit
@@ -200,7 +210,9 @@ h1, h2 {
       </li>
       <li class="list-group-item">Max homes due to height limit: {{round homes_height 3}}</li>
       <li class="list-group-item">Zoning code: {{ zoning }}</li>
+      {{#if height_str }}
       <li class="list-group-item">Height limit code: {{ height_str }}</li>
+      {{/if}}
     </ul>
     {{/compare}}
   </div>
@@ -236,6 +248,16 @@ Handlebars.registerHelper('round', function(num, places, options) {
     }
     var e = Math.pow(10, places);
     return Math.round(num*e) / e;
+});
+
+Handlebars.registerHelper('commas', function(num, options) {
+    if (arguments.length < 2) {
+      throw new Error("Handlebars Helper round needs 1 parameter");
+    }
+
+    var parts = num.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
 });
 
 function htmlDecode(input)
@@ -289,8 +311,6 @@ Handlebars.registerHelper('compare', function (lvalue, operator, rvalue, options
 var map = new mapboxgl.Map({
     container: 'map', // container id
     style: 'mapbox://styles/mapbox/streets-v9',
-    center: [-122.42936665634733, 37.75967613988033], // starting position
-    zoom: 11.75 // starting zoom
 });
 
 // Hide loading bar once tiles from geojson are loaded
@@ -317,17 +337,35 @@ map.addControl(new mapboxgl.GeolocateControl({
     trackUserLocation: true
 }));
 
+var legendTemplate = Handlebars.compile(document.getElementById("legend-template").innerHTML);
 var popupTemplate = Handlebars.compile(document.getElementById("popup-template").innerHTML);
 var legendItemTemplate = Handlebars.compile(document.getElementById("legend-item-template").innerHTML);
 var fineprintTemplate = Handlebars.compile(document.getElementById("fineprint-template").innerHTML);
 var headerTemplate = Handlebars.compile(document.getElementById("header-template").innerHTML);
 
-$.getJSON('generated/key_data.json', function(keyData) {
+var cityCode = window.location.hash.substr(1) || 'sf';
+window.onhashchange = function() {
+  location.reload();
+};
+
+$.getJSON('generated/key_data.' + cityCode + '.json', function(keyData) {
+  window.document.title = keyData.city + ' ' + window.document.title;
+  map.setZoom(keyData.zoom);
+  map.setCenter(keyData.center);
+
+  document.getElementById('legend').insertAdjacentHTML('beforeend', legendTemplate({
+        lot_size: keyData.lot_size,
+        city: keyData.city,
+  }));
   document.getElementById('header').insertAdjacentHTML('beforeend', headerTemplate({
+        lot_size: keyData.lot_size,
         apt_illegal_pct: keyData.apt_illegal_pct,
+        city: keyData.city,
   }));
   document.getElementById('fineprint').insertAdjacentHTML('beforeend', fineprintTemplate({
+        lot_size: keyData.lot_size,
         apt5_illegal_pct: keyData.apt5_illegal_pct,
+        city: keyData.city,
   }));
 
   map.on('load', function () {
@@ -336,7 +374,7 @@ $.getJSON('generated/key_data.json', function(keyData) {
         'type': 'fill',
         'source': {
             'type': 'geojson',
-            'data': 'generated/density_map.geojson'
+            'data': 'generated/density_map.' + cityCode + '.geojson'
         },
         'paint': {
             'fill-opacity': 0.7,
@@ -348,10 +386,12 @@ $.getJSON('generated/key_data.json', function(keyData) {
       // location of the click, with description HTML from its properties.
       map.on('click', 'zones-layer', function (e) {
         var prop = e.features[0].properties;
-          new mapboxgl.Popup()
-              .setLngLat(e.lngLat)
-              .setHTML(popupTemplate(prop))
-              .addTo(map);
+        prop['lot_size'] = keyData.lot_size;
+
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(popupTemplate(prop))
+            .addTo(map);
       });
 
       var legend = document.getElementById('legend-data');

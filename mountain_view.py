@@ -29,6 +29,8 @@ for o in obj['features']:
 
 stats = key_stats(obj['features'], LOT_SIZE)
 stats['city'] = 'Mountain View'
+stats['center'] = [-122.0637322335084, 37.39644593970458]
+stats['zoom'] = 12
 
 with open('generated/key_data.mountain_view.json', 'w') as f:
     json.dump(stats, f)
