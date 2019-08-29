@@ -1,3 +1,7 @@
 *.swp
 *.pyc
 ENV/
+data/
+lib.egg-info/
+
+generated/sf/zoning_height.geojson

@@ -1,9 +1,13 @@
+#!/usr/bin/env python
+
 import json
+import os
 
-from calc.sf import units_per_density_limit, units_per_height, LOT_SIZE
-from calc import color, key_stats
+from lib.fileutil import generated_path
+from lib.calc.sf import units_per_density_limit, units_per_height, LOT_SIZE
+from lib.calc import color, key_stats
 
-with open('generated/zoning_height.geojson') as f:
+with open(generated_path('sf/zoning_height.geojson')) as f:
     obj = json.load(f)
 
 l = obj['features']
@@ -25,10 +29,12 @@ stats['city'] = 'San Francisco'
 stats['center'] = [-122.42936665634733, 37.75967613988033]
 stats['zoom'] = 11.75
 
-with open('generated/key_data.sf.json', 'w') as f:
+os.makedirs(generated_path('sf'), exist_ok=True)
+
+with open(generated_path('sf/key_data.json'), 'w') as f:
     json.dump(stats, f)
 
-with open('generated/density_map.sf.geojson', 'w') as f:
+with open(generated_path('sf/density_map.geojson'), 'w') as f:
     json.dump(obj, f)
 
 print('Illegal to build apartment building in %s%% of SF' % round(stats['apt_illegal_pct'], 1))

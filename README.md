@@ -10,16 +10,19 @@ Run `./install.sh`
 
 # Run
 
-**Make sure you are in the virtualenv by running `. ENV/bin/activate`**
+* `make`
 
-* `python zoning_height_map.py` to generate `generated/zoning_height.geojson`
-* `python stats.py` to generate `generated/density_map.geojson`
+Or, for a specific city:
+* `make sf`
+* `make mountain_view`
 
 # View Map
 
-Run: `python -m http.server`
+Run: `python3 -m http.server`
 
-View the map at http://localhost:8000
+View the maps at:
+* http://localhost:8000
+* http://localhost:8000/#mountain_view
 
 # Warning
 

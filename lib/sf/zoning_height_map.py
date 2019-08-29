@@ -1,12 +1,17 @@
+#!/usr/bin/env python
+
 import json
+import os
 from collections import namedtuple
+
+from lib.fileutil import data_path, generated_path
 
 from shapely.geometry import shape
 import shapely
 
 Zone = namedtuple('Zone', 'polygon zoning zoning_sim index')
 
-with open('data/zoning.geojson') as f:
+with open(data_path('zoning.geojson')) as f:
     obj = json.load(f)
     print(obj['features'][0]['properties']['zoning'])
 
@@ -20,7 +25,7 @@ for i, o in enumerate(obj['features']):
         zoning_sim=zoning_sim,
         index=i))
 
-with open('data/height.geojson') as f:
+with open(data_path('height.geojson')) as f:
     obj = json.load(f)
     print(obj['features'][100]['properties']['gen_hght'])
 
@@ -63,5 +68,7 @@ for r in res:
         geometry=shapely.geometry.geo.mapping(r.polygon),
     ))
 
-with open('generated/zoning_height.geojson', 'w') as f:
+os.makedirs(generated_path('sf'), exist_ok=True)
+
+with open(generated_path('sf/zoning_height.geojson'), 'w') as f:
     json.dump(dict(type='FeatureCollection', features=obj), f)

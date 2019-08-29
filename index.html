@@ -349,7 +349,7 @@ window.onhashchange = function() {
   location.reload();
 };
 
-$.getJSON('generated/key_data.' + cityCode + '.json', function(keyData) {
+$.getJSON('generated/' + cityCode + '/key_data.json', function(keyData) {
   window.document.title = keyData.city + ' ' + window.document.title;
   map.setZoom(keyData.zoom);
   map.setCenter(keyData.center);
@@ -375,7 +375,7 @@ $.getJSON('generated/key_data.' + cityCode + '.json', function(keyData) {
         'type': 'fill',
         'source': {
             'type': 'geojson',
-            'data': 'generated/density_map.' + cityCode + '.geojson'
+            'data': 'generated/' + cityCode + '/density_map.geojson'
         },
         'paint': {
             'fill-opacity': 0.7,
