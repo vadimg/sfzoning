@@ -24,7 +24,7 @@ for o in l:
     prop['fill'] = color(homes)
 
 
-stats = key_stats(l, LOT_SIZE)
+stats = key_stats(l, lot_size=LOT_SIZE, all_area_denom=True)
 stats['city'] = 'San Francisco'
 stats['center'] = [-122.42936665634733, 37.75967613988033]
 stats['zoom'] = 11.75

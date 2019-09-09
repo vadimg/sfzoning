@@ -59,7 +59,7 @@ def sq_ft(geom):
     return projected_area * SQ_METER_TO_SQ_FEET
 
 
-def key_stats(features, lot_size):
+def key_stats(features, *, lot_size, all_area_denom):
     affordable_sqft = 0
     residential_sqft = 0
 
@@ -79,8 +79,9 @@ def key_stats(features, lot_size):
     non_os_area = sum(v for k, v in home_areas.items() if k >= 0)
     all_area = sum(home_areas.values())
 
+    apt_legal_area = 0
     apt_illegal_area = 0
-    apt5_illegal_area = 0
+    apt5_legal_area = 0
     dat = []
     for m in sorted(home_areas.keys()):
         percentage = 100.0 * home_areas[m] / all_area
@@ -90,11 +91,10 @@ def key_stats(features, lot_size):
             "color": color(m),
         })
 
-        if m >= 0:
-            if m <= 2:
-                apt_illegal_area += home_areas[m]
-            if m <= 5:
-                apt5_illegal_area += home_areas[m]
+        if m > 2:
+            apt_legal_area += home_areas[m]
+        if m > 5:
+            apt5_legal_area += home_areas[m]
 
         if m > 20:
             # the rest will be labeled "> 20"
@@ -103,11 +103,13 @@ def key_stats(features, lot_size):
     total_percent = sum(x['percentage'] for x in dat[:-1])
     dat[-1]['percentage'] = 100 - total_percent
 
+    denom = all_area if all_area_denom else non_os_area
+
     return dict(
         lot_size=lot_size,
         key=dat,
-        apt_illegal_pct=100 * apt_illegal_area / non_os_area,
-        apt5_illegal_pct=100 * apt5_illegal_area / non_os_area,
+        apt_illegal_pct=100 - 100 * apt_legal_area / denom,
+        apt5_illegal_pct=100 - 100 * apt5_legal_area / denom,
         affordable_illegal_resi_pct=100 - 100 * affordable_sqft / residential_sqft,
-        affordable_illegal_pct=100 - 100 * affordable_sqft / non_os_area,
+        affordable_illegal_pct=100 - 100 * affordable_sqft / denom,
     )

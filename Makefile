@@ -5,6 +5,9 @@ all: sf mountain_view
 clean:
 	rm -rf generated/*
 
+clean_maps:
+	find . | grep density_map | xargs rm
+
 sf: generated/sf/density_map.geojson
 
 mountain_view: generated/mountain_view/density_map.geojson

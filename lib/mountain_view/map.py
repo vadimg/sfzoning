@@ -31,7 +31,7 @@ for o in obj['features']:
 
     print(zoning, round(min(homes_density, homes_height), 1))
 
-stats = key_stats(obj['features'], LOT_SIZE)
+stats = key_stats(obj['features'], lot_size=LOT_SIZE, all_area_denom=False)
 stats['city'] = 'Mountain View'
 stats['center'] = [-122.0637322335084, 37.39644593970458]
 stats['zoom'] = 12
