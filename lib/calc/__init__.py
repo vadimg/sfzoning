@@ -93,7 +93,7 @@ def key_stats(features, *, lot_size, all_area_denom):
 
         if m > 2:
             apt_legal_area += home_areas[m]
-        if m > 5:
+        if m >= 5:
             apt5_legal_area += home_areas[m]
 
         if m > 20:
