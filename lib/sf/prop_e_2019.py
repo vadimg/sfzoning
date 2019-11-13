@@ -3,7 +3,7 @@ from shapely.geometry import shape
 from lib.calc import METER_TO_FEET
 from lib.fileutil import load, dump, generated_path, data_path
 from lib.calc import sq_ft
-from lib.calc.sf import address, units_per_height, units_per_density_limit
+from lib.calc.sf import units_per_height, units_per_density_limit
 from lib.polygon_index import PolygonIndex
 
 

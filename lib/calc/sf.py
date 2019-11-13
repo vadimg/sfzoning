@@ -172,9 +172,14 @@ def units_per_height(height_code, height_num, zoning, lot_size=LOT_SIZE):
 def address(prop):
     from_st = prop['from_st']
     to_st = prop['to_st']
+    st_type = prop['st_type']
+
+    if not st_type:
+        st_type = ''
+
     number = from_st if from_st == to_st else '%s-%s' % (from_st, to_st)
-    return '%s %s %s' % (
-        number,
-        prop['street'],
-        prop['st_type'],
-    )
+
+    if not number or not prop['street']:
+        return 'UNKNOWN'
+
+    return '%s %s %s' % (number, prop['street'], st_type)
