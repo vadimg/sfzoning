@@ -1,27 +1,26 @@
 from shapely.geometry import shape
 
-from fileutil import load, dump
-from polygon_index import PolygonIndex
+from lib.fileutil import load, dump, generated_path, data_path
+from lib.polygon_index import PolygonIndex
 
 
 def main():
-    lots = load('generated/lot_zoning.geojson')
+    lots = load(generated_path('sf/lot_zoning.geojson'))
+    buildings = load(data_path('buildings.geojson'))
 
     index = PolygonIndex()
     for i, obj in enumerate(lots):
-        print '%s / %s' % (i + 1, len(lots))
+        print('%s / %s' % (i + 1, len(lots)))
         index.add_obj(obj)
-
-    buildings = load('data/buildings.geojson')
 
     not_found = []
 
     def dumpall():
-        dump('generated/lot_building_zoning.geojson', lots)
-        dump('generated/building_not_found_for_lot.geojson', not_found)
+        dump(generated_path('sf/lot_building_zoning.geojson'), lots)
+        dump(generated_path('sf/building_not_found_for_lot.geojson'), not_found)
 
     for i, obj in enumerate(buildings):
-        print '%s / %s' % (i + 1, len(buildings))
+        print('%s / %s' % (i + 1, len(buildings)))
 
         if i % 10000 == 0:
             dumpall()
@@ -38,15 +37,15 @@ def main():
             intersects.append((lot.data, intersect.area))
 
         if not intersects:
-            print 'LOT NOT FOUND', obj
+            print('LOT NOT FOUND', obj)
             not_found.append(obj)
             continue
 
-        print len(intersects)
+        print(len(intersects))
         if len(intersects) != 1:
             for x in intersects:
                 if poly.area:
-                    print '\t', 100.0 * x[1] / poly.area
+                    print('\t', 100.0 * x[1] / poly.area)
 
         max_i = max(intersects, key=lambda x: x[1])
         max_i[0]['properties'].setdefault('buildings', []).append(obj)

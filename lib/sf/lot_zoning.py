@@ -1,28 +1,33 @@
 from shapely.geometry import shape
 
-from fileutil import load, dump
-from calc import sq_ft, address
-from polygon_index import PolygonIndex
+from lib.fileutil import load, dump, generated_path, data_path
+from lib.calc import sq_ft
+from lib.calc.sf import address
+from lib.polygon_index import PolygonIndex
 
 
 def main():
-    zones = load('generated/density_map.geojson')
+    zones = load(generated_path('sf/density_map.geojson'))
+    lots = load(data_path('lots.geojson'))
 
     index = PolygonIndex()
     for i, obj in enumerate(zones):
         print('%s / %s' % (i + 1, len(zones)))
         index.add_obj(obj)
 
-    lots = load('data/lots.geojson')
-
     lot_zoning = []
     not_found = []
+
+    def dumpall():
+        dump(generated_path('sf/lot_zoning.geojson'), lot_zoning)
+        dump(generated_path('sf/zone_not_found_for_lot.geojson'), not_found)
+
+
     for i, obj in enumerate(lots):
         print('%s / %s' % (i + 1, len(lots)))
 
         if i % 10000 == 0:
-            dump('generated/lot_zoning.geojson', lot_zoning)
-            dump('generated/zone_not_found_for_lot.geojson', not_found)
+            dumpall()
 
         lot_poly = shape(obj['geometry'])
         intersecting = index.intersecting(lot_poly)
@@ -50,8 +55,7 @@ def main():
 
         lot_zoning.append(obj)
 
-    dump('generated/lot_zoning.geojson', lot_zoning)
-    dump('generated/zone_not_found_for_lot.geojson', not_found)
+    dumpall()
 
 
 if __name__ == '__main__':
