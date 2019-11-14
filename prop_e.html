@@ -277,7 +277,8 @@ map.addControl(new mapboxgl.NavigationControl({showCompass: false}));
 
 var popupTemplate = Handlebars.compile(document.getElementById("popup-template").innerHTML);
 
-var infeasible_reasons = {};
+var infeasibleReasons = {};
+var verifiedInfeasible = {};
 
 function refreshInfeasibleReasons() {
   $.ajax("https://spreadsheets.google.com/feeds/cells/12K_3fmt9NTjZqy54zF-yccoIayTi78AVNA3rR3LUX74/1/public/full?alt=json")
@@ -296,7 +297,10 @@ function refreshInfeasibleReasons() {
           curId = cell.content.$t;
         }
         if (col === 3) {
-          infeasible_reasons[curId] = cell.content.$t;
+          infeasibleReasons[curId] = cell.content.$t;
+        }
+        if (col === 4 && cell.content.$t == 'Y') {
+          verifiedInfeasible[curId] = true;
         }
       });
       filterInfeasible();
@@ -318,13 +322,22 @@ function filterInfeasible() {
   mapData.features.forEach(function(feat) {
     var prop = feat.properties;
     var oid = prop.objectid;
-    if (infeasible_reasons[oid]) {
+    if (infeasibleReasons[oid]) {
       var ORANGE = '#ff6e00';
-      if (prop['fill'] != ORANGE) {
-        changed = true;
+      var RED = '#c60003';
+      if (verifiedInfeasible[oid]) {
+        if (prop['fill'] != RED) {
+          changed = true;
+        }
+        prop['fill'] = RED;
+        prop['opacity'] = 0.2;
+      } else {
+        if (prop['fill'] != ORANGE) {
+          changed = true;
+        }
+        prop['fill'] = ORANGE;
+        prop['opacity'] = 0.3;
       }
-      prop['fill'] = ORANGE;
-      prop['opacity'] = 0.3;
     }
   });
 
@@ -373,8 +386,11 @@ function addLayer() {
 // location of the click, with description HTML from its properties.
 map.on('click', 'zones-layer', function (e) {
   var prop = e.features[0].properties;
-  if (infeasible_reasons[prop.objectid]) {
-    prop.infeasible_reason = infeasible_reasons[prop.objectid] + ' (unverified)';
+  if (infeasibleReasons[prop.objectid]) {
+    prop.infeasible_reason = infeasibleReasons[prop.objectid];
+    if (!verifiedInfeasible[prop.objectid]) {
+      prop.infeasible_reason += ' (unverified)';
+    }
   }
 
   // for some reason all props get converted to string...
