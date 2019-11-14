@@ -49,25 +49,38 @@ def main():
 
         # make it bright green
         prop['fill'] = '#7eb100'
+        prop['opacity'] = 0.7
 
         max_height = 0
         for building in prop.get('buildings', []):
             height_ft = METER_TO_FEET * float(building['properties']['hgt_mediancm']) / 100.0
             max_height = max(max_height, height_ft)
             print('\t', height_ft)
+
         prop['max_building_height'] = max_height
+        prop['oldhomes'] = oldhomes
+        prop['newhomes'] = newhomes
+        if 'buildings' in prop:
+            del prop['buildings']
+
+        CANNOT_DEMOLISH = {
+            'fill': '#c60003',
+            'opacity': 0.2,
+        }
 
         # demolishing non-warehouse buildings taller than 35ft is too expensive
         if prop['landuse'] != 'PDR' and max_height > 35:
             too_tall_nonwarehouse += 1
-            prop['fill'] = '#c60003'
-            continue
+            prop['infeasible_reason'] = (
+                'demolishing non-warehouse buildings taller than 35ft is too expensive')
+            prop.update(CANNOT_DEMOLISH)
 
         # demolishing buildings taller than 50ft is too expensive
         if max_height > 50:
             too_tall += 1
-            prop['fill'] = '#ff6e00'
-            continue
+            prop['infeasible_reason'] = (
+                'demolishing buildings taller than 50ft is too expensive')
+            prop.update(CANNOT_DEMOLISH)
 
         new_lots.append(lot)
 
@@ -75,7 +88,7 @@ def main():
 
     print(len(new_lots), too_tall, too_tall_nonwarehouse)
 
-    dump(generated_path('sf/prop_e_2019.geojson'), new_lots)
+    dump(generated_path('sf/prop_e.geojson'), new_lots)
 
 
 if __name__ == '__main__':

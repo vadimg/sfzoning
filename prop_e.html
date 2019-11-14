@@ -6,6 +6,11 @@
 <link href="https://www.mapbox.com/base/latest/base.css" rel="stylesheet" />
 <style>
 
+.list-group-item.warning {
+  font-weight: bold;
+  color: #c60003;
+}
+
 #loader {
   display: flex;
   align-items: center;
@@ -132,16 +137,17 @@ h1, h2 {
   <div id="popup-template">
     <h4>Details:</h4>
     <ul class="list-group">
-      <li class="list-group-item"><b>Available units (normalized): {{ avail_norm }}</b></li>
-      <li class="list-group-item">Resunits: {{ resunits }}</li>
+      {{#if infeasible_reason}}
+      <li class="list-group-item warning">Infeasible because: {{ infeasible_reason }}</li>
+      {{/if}}
+      <li class="list-group-item">Number of homes allowed due to Prop E: {{ round newhomes 0 }}</li>
+      <li class="list-group-item">Number of homes allowed before Prop E: {{ round oldhomes 0 }}</li>
       <li class="list-group-item">Land use: {{ landuse }}</li>
-      <li class="list-group-item">Max building height: {{ max_building_height }}</li>
-      <li class="list-group-item"><b>Available units: {{ avail }}</b></li>
-      <li class="list-group-item">Zoning code: {{ zcode }}</li>
-      <li class="list-group-item">Height code: {{ hcode }}</li>
-      <li class="list-group-item">Address: {{ address }}</li>
-      <li class="list-group-item">Area: {{ sqft }}</li>
-      <li class="list-group-item">Full object: {{ zoning }}</li>
+      <li class="list-group-item">Max building height: {{ round max_building_height 0 }} ft</li>
+      <li class="list-group-item">Zoning code: {{ zoning.zoning }}</li>
+      <li class="list-group-item">Height code: {{ zoning.height_str }}</li>
+      <li class="list-group-item">Address: <a href="https://www.google.com/maps/search/?api=1&query={{address}}" target="_blank">{{ address }}</a></li>
+      <li class="list-group-item">Area: {{ round sqft 0 }} sqft</li>
     </ul>
   </div>
 </div>
@@ -237,23 +243,29 @@ map.on('load', function () {
       'type': 'fill',
       'source': {
           'type': 'geojson',
-          'data': 'generated/sf/prop_e_2019.geojson'
+          'data': 'generated/sf/prop_e.geojson'
       },
       'paint': {
-          'fill-opacity': 0.7,
-          'fill-color': ['get', 'fill']
+          'fill-opacity': ['get', 'opacity'],
+          'fill-color': ['get', 'fill'],
       }
   });
 
-    // When a click event occurs on a feature in the states layer, open a popup at the
-    // location of the click, with description HTML from its properties.
-    map.on('click', 'zones-layer', function (e) {
-      var prop = e.features[0].properties;
-        new mapboxgl.Popup()
-            .setLngLat(e.lngLat)
-            .setHTML(popupTemplate(prop))
-            .addTo(map);
-    });
+  // When a click event occurs on a feature in the states layer, open a popup at the
+  // location of the click, with description HTML from its properties.
+  map.on('click', 'zones-layer', function (e) {
+    var prop = e.features[0].properties;
+
+    // for some reason all props get converted to string...
+    if (typeof prop.zoning === 'string') {
+      prop['zoning'] = JSON.parse(prop['zoning']);
+    }
+
+    new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(popupTemplate(prop))
+        .addTo(map);
+  });
 });
 
 </script>
