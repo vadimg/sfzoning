@@ -149,6 +149,10 @@ h1, h2 {
       <li class="list-group-item">Address: <a href="https://www.google.com/maps/search/?api=1&query={{address}}" target="_blank">{{ address }}</a></li>
       <li class="list-group-item">Area: {{ round sqft 0 }} sqft</li>
     </ul>
+    {{#if infeasible_reason}}
+    {{else}}
+    <p><strong>Is this plot infeasible to build on? <a href="https://docs.google.com/forms/d/e/1FAIpQLSe_2i1fHrQ53QnDeq_ZZqX1rge-_xqrkncj_eS3GmKvq9z5Bg/viewform?usp=pp_url&entry.2122496298={{ objectid }}" target="_blank">Let me know!</a></strong></p>
+    {{/if}}
   </div>
 </div>
 <!-- end templates -->
