@@ -7,6 +7,13 @@
 <link href="https://www.mapbox.com/base/latest/base.css" rel="stylesheet" />
 <style>
 
+#menu {
+  position: absolute;
+  background: #fff;
+  padding: 10px;
+  font-family: 'Open Sans', sans-serif;
+}
+
 .list-group-item.warning {
   font-weight: bold;
   color: #c60003;
@@ -131,10 +138,17 @@ h1, h2 {
       </svg>
     </div>
   </div>
+
+<div id='menu'>
+<input id='satellite-check' type='checkbox' name='rtoggle' value='satellite'>
+<label for='satellite'>satellite</label>
+</div>
+
 </div>
 
 <!-- templates -->
 <div style="display: none">
+
   <div id="popup-template">
     <h4>Details:</h4>
     <ul class="list-group">
@@ -224,6 +238,28 @@ var map = new mapboxgl.Map({
     zoom: 11.75 // starting zoom
 });
 
+
+// setup satellite view toggle
+var satCheckBox = document.getElementById('satellite-check');
+
+function switchLayer() {
+  var layerId = 'dark-v9';
+  if (satCheckBox.checked) {
+    layerId = 'satellite-v9';
+  }
+  map.setStyle('mapbox://styles/mapbox/' + layerId);
+  function waitToAddLayer() {
+    if (map.isStyleLoaded()) {
+      addLayer();
+      return;
+    }
+
+    setTimeout(waitToAddLayer, 200);
+  }
+  waitToAddLayer();
+}
+$(satCheckBox).click(switchLayer);
+
 // Hide loading bar once tiles from geojson are loaded
 map.on('data', function(e) {
     if (e.dataType === 'source' && e.sourceId === 'zones-layer') {
@@ -271,7 +307,7 @@ function refreshInfeasibleReasons() {
 refreshInfeasibleReasons();
 setInterval(refreshInfeasibleReasons, 15e3);
 
-map.on('load', function () {
+function addLayer() {
   map.addLayer({
       'id': 'zones-layer',
       'type': 'fill',
@@ -284,26 +320,28 @@ map.on('load', function () {
           'fill-color': ['get', 'fill'],
       }
   });
+}
 
-  // When a click event occurs on a feature in the states layer, open a popup at the
-  // location of the click, with description HTML from its properties.
-  map.on('click', 'zones-layer', function (e) {
-    var prop = e.features[0].properties;
-    if (infeasible_reasons[prop.objectid]) {
-      prop.infeasible_reason = infeasible_reasons[prop.objectid] + ' (unverified)';
-    }
+// When a click event occurs on a feature in the states layer, open a popup at the
+// location of the click, with description HTML from its properties.
+map.on('click', 'zones-layer', function (e) {
+  var prop = e.features[0].properties;
+  if (infeasible_reasons[prop.objectid]) {
+    prop.infeasible_reason = infeasible_reasons[prop.objectid] + ' (unverified)';
+  }
 
-    // for some reason all props get converted to string...
-    if (typeof prop.zoning === 'string') {
-      prop['zoning'] = JSON.parse(prop['zoning']);
-    }
+  // for some reason all props get converted to string...
+  if (typeof prop.zoning === 'string') {
+    prop['zoning'] = JSON.parse(prop['zoning']);
+  }
 
-    new mapboxgl.Popup()
-        .setLngLat(e.lngLat)
-        .setHTML(popupTemplate(prop))
-        .addTo(map);
-  });
+  new mapboxgl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(popupTemplate(prop))
+      .addTo(map);
 });
+
+map.on('load', addLayer);
 
 </script>
 </body>
