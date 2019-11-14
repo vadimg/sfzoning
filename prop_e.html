@@ -150,7 +150,7 @@ h1, h2 {
 <div style="display: none">
 
   <div id="popup-template">
-    <h4>Details:</h4>
+    <h4>Details for lot {{objectid}}:</h4>
     <ul class="list-group">
       {{#if infeasible_reason}}
       <li class="list-group-item warning">Infeasible because: {{ infeasible_reason }}</li>
@@ -238,6 +238,20 @@ var map = new mapboxgl.Map({
     zoom: 11.75 // starting zoom
 });
 
+function waitToAddLayer() {
+  if (map.isStyleLoaded()) {
+    var curSource = map.getSource('zones');
+    if (curSource) {
+      map.removeLayer('zones-layer');
+      map.removeSource('zones');
+    }
+
+    addLayer();
+    return;
+  }
+
+  setTimeout(waitToAddLayer, 200);
+}
 
 // setup satellite view toggle
 var satCheckBox = document.getElementById('satellite-check');
@@ -248,24 +262,9 @@ function switchLayer() {
     layerId = 'satellite-v9';
   }
   map.setStyle('mapbox://styles/mapbox/' + layerId);
-  function waitToAddLayer() {
-    if (map.isStyleLoaded()) {
-      addLayer();
-      return;
-    }
-
-    setTimeout(waitToAddLayer, 200);
-  }
   waitToAddLayer();
 }
 $(satCheckBox).click(switchLayer);
-
-// Hide loading bar once tiles from geojson are loaded
-map.on('data', function(e) {
-    if (e.dataType === 'source' && e.sourceId === 'zones-layer') {
-        document.getElementById("loader").style.display = "none";
-    }
-});
 
 // disable map rotation using right click + drag
 map.dragRotate.disable();
@@ -300,21 +299,61 @@ function refreshInfeasibleReasons() {
           infeasible_reasons[curId] = cell.content.$t;
         }
       });
+      filterInfeasible();
     });
 }
 
+
 // load ASAP, and refresh every 15 seconds
 refreshInfeasibleReasons();
-setInterval(refreshInfeasibleReasons, 15e3);
+setInterval(refreshInfeasibleReasons, 10e3);
+
+var mapData;
+
+function filterInfeasible() {
+  if (!mapData) {
+    return;
+  }
+  var changed = false;
+  mapData.features.forEach(function(feat) {
+    var prop = feat.properties;
+    var oid = prop.objectid;
+    if (infeasible_reasons[oid]) {
+      var ORANGE = '#ff6e00';
+      if (prop['fill'] != ORANGE) {
+        changed = true;
+      }
+      prop['fill'] = ORANGE;
+      prop['opacity'] = 0.3;
+    }
+  });
+
+  if (changed) {
+    waitToAddLayer();
+  }
+}
+
+$.ajax("generated/sf/prop_e.geojson")
+    .done(function(data) {
+      mapData = JSON.parse(data);
+      filterInfeasible();
+      document.getElementById("loader").style.display = "none";
+    });
 
 function addLayer() {
+  if (!mapData) {
+    return;
+  }
+
+  map.addSource('zones', {
+    'type': 'geojson',
+    'data': mapData
+  });
+
   map.addLayer({
       'id': 'zones-layer',
       'type': 'fill',
-      'source': {
-          'type': 'geojson',
-          'data': 'generated/sf/prop_e.geojson'
-      },
+      'source': 'zones',
       'paint': {
           'fill-opacity': ['get', 'opacity'],
           'fill-color': ['get', 'fill'],
@@ -340,8 +379,6 @@ map.on('click', 'zones-layer', function (e) {
       .setHTML(popupTemplate(prop))
       .addTo(map);
 });
-
-map.on('load', addLayer);
 
 </script>
 </body>
