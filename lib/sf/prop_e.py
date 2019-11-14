@@ -29,15 +29,18 @@ def main():
         if prop['sqft'] < 10e3:
             continue
 
+        # affordable devs won't build taller than 85ft due to cost
+        height = min(zoning['height'], 85)
+
         homes_zoning = units_per_density_limit(zoning['zoning'], lot_size=prop['sqft'])
         homes_height = units_per_height(
             zoning['height_str'],
-            zoning['height'],
+            height,
             zoning['zoning'],
             lot_size=prop['sqft'])
         oldhomes = min(homes_zoning, homes_height)
 
-        newhomes = units_per_height('', prop['zoning']['height'], '', prop['sqft'])
+        newhomes = units_per_height('', height, '', prop['sqft'])
 
         # affordable projects need at least 50 homes to get funding
         if newhomes < 50:
