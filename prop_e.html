@@ -1,5 +1,6 @@
 <html>
 <head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
@@ -241,6 +242,35 @@ map.addControl(new mapboxgl.NavigationControl({showCompass: false}));
 
 var popupTemplate = Handlebars.compile(document.getElementById("popup-template").innerHTML);
 
+var infeasible_reasons = {};
+
+function refreshInfeasibleReasons() {
+  $.ajax("https://spreadsheets.google.com/feeds/cells/12K_3fmt9NTjZqy54zF-yccoIayTi78AVNA3rR3LUX74/1/public/full?alt=json")
+    .done(function(data) {
+      var curId;
+      data.feed.entry.forEach(function(cell) {
+        var row = parseInt(cell.gs$cell.row);
+        var col = parseInt(cell.gs$cell.col);
+
+        // skip first row
+        if (row === 1) {
+          return;
+        }
+
+        if (col === 2) {
+          curId = cell.content.$t;
+        }
+        if (col === 3) {
+          infeasible_reasons[curId] = cell.content.$t;
+        }
+      });
+    });
+}
+
+// load ASAP, and refresh every 15 seconds
+refreshInfeasibleReasons();
+setInterval(refreshInfeasibleReasons, 15e3);
+
 map.on('load', function () {
   map.addLayer({
       'id': 'zones-layer',
@@ -259,6 +289,9 @@ map.on('load', function () {
   // location of the click, with description HTML from its properties.
   map.on('click', 'zones-layer', function (e) {
     var prop = e.features[0].properties;
+    if (infeasible_reasons[prop.objectid]) {
+      prop.infeasible_reason = infeasible_reasons[prop.objectid] + ' (unverified)';
+    }
 
     // for some reason all props get converted to string...
     if (typeof prop.zoning === 'string') {
