@@ -353,12 +353,17 @@ function addLayer() {
     'data': mapData
   });
 
+  var opacity = ['get', 'opacity'];
+  if (satCheckBox.checked) {
+    opacity = 0.2;
+  }
+
   map.addLayer({
       'id': 'zones-layer',
       'type': 'fill',
       'source': 'zones',
       'paint': {
-          'fill-opacity': ['get', 'opacity'],
+          'fill-opacity': opacity,
           'fill-color': ['get', 'fill'],
       }
   });
