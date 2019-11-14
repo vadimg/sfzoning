@@ -179,7 +179,7 @@ def address(prop):
 
     number = from_st if from_st == to_st else '%s-%s' % (from_st, to_st)
 
-    if not number or not prop['street']:
+    if not number or number == '0' or not prop['street'] or prop['street'] == 'UNKNOWN':
         return 'UNKNOWN'
 
     return '%s %s %s' % (number, prop['street'], st_type)
