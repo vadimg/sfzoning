@@ -126,3 +126,57 @@ P70-MU: 0
 PPS-MU: 0
 BR-MU: 400  # same as RM-3
 P: 1.00E+09
+
+
+# ---- from the 2000 map:
+RH1: 3000
+RH2: 1500
+RH3: 1000
+RM1: 800
+RM3NC3: 400
+RM4: 200
+RC4: 200
+NC1: 800
+NC2: 800
+NC3: 600
+NCS: 800
+M1: 1.0E+9
+M2: 1.0E+9
+M-2 (MB): 1.0E+9
+P (MB): 1.0E+9
+RSD: 0
+SLR: 0
+
+# used 2021's NCD numbers for this
+UNION: 600
+NO BEACH: 400
+POLK: 400
+FILLMORE: 0
+BROADWAY: 400
+UPR MARKET: 0
+SACRAMENTO: 800
+INNER CLEMENT: 600
+HAYES: 0
+OUTER CLEMENT: 600
+CASTRO: 600
+VALENCIA: 0
+HAIGHT: 60
+24TH-MISSION: 0
+24TH-NOE: 600
+WEST PORTAL: 800
+
+# not sure:
+#RC-1
+#RC-2
+
+# https://repository.uchastings.edu/cgi/viewcontent.cgi?article=1690&context=hastings_law_journal
+C-M: 1.0E+9
+
+# https://codelibrary.amlegal.com/codes/san_francisco/latest/sf_planning/0-0-0-26729
+CR-NC: 200
+
+# used this table to compute an average lot size per unit of 577:
+# https://codelibrary.amlegal.com/codes/san_francisco/latest/sf_planning/0-0-0-27456
+MB: 577
+
+# ---- end of 2000 map

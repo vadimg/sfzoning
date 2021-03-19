@@ -20,16 +20,19 @@ class NewZoneDetected(Exception):
     pass
 
 
-def units_per_density_limit(zone, lot_size=LOT_SIZE, per_lot_size=True):
+def units_per_density_limit(zone, lot_size=LOT_SIZE, per_lot_size=True,
+                            waiverless_adus=True):
     if '-OS' in zone:
         # a special open space zone
         return -1
 
+    sfh = 2 if waiverless_adus else 1
+
     fixed = {
         'P': -1,  # parks are < 0
-        'RH-1(D)': 2.0 * ((lot_size / 4000) if per_lot_size else 1),  # minimum lot size 4000 sq ft
-        'RH-1': 2,
-        'RH-1(S)': 2,
+        'RH-1(D)': sfh * ((lot_size / 4000.0) if per_lot_size else sfh),  # minimum lot size 4000 sq ft
+        'RH-1': sfh,
+        'RH-1(S)': sfh,
         'RH-2': 2,
         'RH-3': 3,
     }

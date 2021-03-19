@@ -26,7 +26,6 @@ def main():
 
         homes_height = units_per_height(prop['height_str'], prop['height'], prop['zoning'])
         homes = min(homes_zoning, homes_height)
-        t = (homes_zoning, homes_height, homes, prop['height_str'])
         prop['homes'] = homes
         prop['homes_zoning'] = homes_zoning
         prop['homes_height'] = homes_height

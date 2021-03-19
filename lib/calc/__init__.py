@@ -33,8 +33,15 @@ for l in COLORS.split('\n'):
         colors[int(units)] = color
 
 
+def round_units(units):
+    # super-low density counts as 1 home as long as any housing is allowed
+    if 0 < units < 1:
+        return 1
+    return int(units)
+
+
 def color(units):
-    units = int(units)
+    units = round_units(units)
     if units > 20:
         return colors[max(colors.keys())]
 
@@ -74,7 +81,7 @@ def key_stats(features, *, lot_size, all_area_denom):
         if homes >= 50 / (10e3 / lot_size):
             affordable_sqft += area
 
-        home_areas[int(homes)] += area
+        home_areas[round_units(homes)] += area
 
     non_os_area = sum(v for k, v in home_areas.items() if k >= 0)
     all_area = sum(home_areas.values())
