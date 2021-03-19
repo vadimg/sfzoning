@@ -8,7 +8,9 @@ clean:
 clean_maps:
 	find . | grep density_map | xargs rm
 
-sf: generated/sf/density_map.geojson generated/sf/prop_e.geojson
+sf: generated/sf/density_map.geojson
+
+prop_e: generated/sf/prop_e.geojson
 
 mountain_view: generated/mountain_view/density_map.geojson
 
@@ -18,7 +20,13 @@ generated/sf/density_map.geojson: generated/sf/zoning_height.geojson
 generated/sf/zoning_height.geojson:
 	ENV/bin/python ./lib/sf/zoning_height_map.py
 
-generated/sf/prop_e.geojson:
+generated/sf/lot_zoning.geojson: generated/sf/density_map.geojson
+	ENV/bin/python ./lib/sf/lot_zoning.py
+
+generated/sf/lot_building_zoning.geojson: generated/sf/lot_zoning.geojson
+	ENV/bin/python ./lib/sf/lot_buildings.py
+
+generated/sf/prop_e.geojson: generated/sf/lot_building_zoning.geojson
 	ENV/bin/python ./lib/sf/prop_e.py
 
 generated/mountain_view/density_map.geojson:

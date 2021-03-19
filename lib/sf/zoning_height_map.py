@@ -42,7 +42,11 @@ for i, o in enumerate(obj['features']):
     p = shape(o['geometry'])
     intersects = []
     for zone in zones:
-        intersect = p.intersection(zone.polygon)
+        # fix self-intersecting polygons
+        p = p.buffer(0)
+        zp = zone.polygon.buffer(0)
+
+        intersect = p.intersection(zp)
         if not intersect.is_empty:
             l = (list(intersect)
                  if intersect.geom_type == 'GeometryCollection'

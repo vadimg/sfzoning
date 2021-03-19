@@ -26,8 +26,9 @@ def main():
     for i, obj in enumerate(lots):
         print('%s / %s' % (i + 1, len(lots)))
 
-        if i % 10000 == 0:
-            dumpall()
+        # commented out because we don't want partial results to be accepted
+        # if i % 10000 == 0:
+        #   dumpall()
 
         lot_poly = shape(obj['geometry'])
         intersecting = index.intersecting(lot_poly)

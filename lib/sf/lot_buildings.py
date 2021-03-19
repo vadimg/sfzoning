@@ -22,10 +22,8 @@ def main():
     for i, obj in enumerate(buildings):
         print('%s / %s' % (i + 1, len(buildings)))
 
-        if i % 10000 == 0:
-            dumpall()
-
         poly = shape(obj['geometry'])
+        poly = poly.buffer(0)  # fix self-intersection polygons
         intersecting = index.intersecting(poly)
 
         intersects = []
