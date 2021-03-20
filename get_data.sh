@@ -13,4 +13,5 @@ curl 'https://opendata.arcgis.com/datasets/f9aced0c78b446f99d43653512b402d6_0.ge
 
 # historical SF data
 curl 'https://data.sfgov.org/api/geospatial/prs8-k8k3?method=export&format=GeoJSON' > data/zoning_height_2000.geojson
-curl 'https://data.sfgov.org/api/geospatial/w3j2-4hed?method=export&format=GeoJSON' > data/zoning_height_2010.geojson
+curl 'https://data.sfgov.org/api/geospatial/w3j2-4hed?method=export&format=GeoJSON' > data/zoning_2010.geojson
+curl 'https://data.sfgov.org/api/geospatial/ti28-5szz?method=export&format=GeoJSON' > data/height_2010.geojson
