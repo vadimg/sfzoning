@@ -12,7 +12,7 @@ class Results(object):
 
     def results(self):
         res = []
-        for k, v in self._dict.iteritems():
+        for k, v in self._dict.items():
             res.append('%s: %s' % (k, v))
         return '\n'.join(res)
 

@@ -20,7 +20,7 @@ class NewZoneDetected(Exception):
     pass
 
 
-def units_per_density_limit(zone, lot_size=LOT_SIZE, per_lot_size=True,
+def units_per_density_limit(zone, *, lot_size=LOT_SIZE, per_lot_size=True,
                             waiverless_adus=True):
     if '-OS' in zone:
         # a special open space zone
