@@ -9,6 +9,7 @@ from lib.fileutil import generated_path
 from lib.fileutil import load, dump
 
 from collections import defaultdict
+from colorutils import Color
 
 
 # in ft, how much taller should the building be than allowed to mark it as illegal
@@ -77,14 +78,17 @@ def main():
 
         illegal_units = 0
         reasons = []
+        color = Color((0, 0, 0))
 
         if area + AREA_BUFFER < min_area:
             illegal_units = units
             reasons.append('lot too small')
+            color += Color(hex='#ff4224')  # red
 
         if units > allowed_units_density:
             illegal_units = max(illegal_units, units - int(allowed_units_density))
             reasons.append('too dense')
+            color += Color(hex='#7b91f8')  # blue
 
 
         if max_median_height - HEIGHT_BUFFER > zoning['height']:
@@ -113,6 +117,7 @@ def main():
             if allowed_units < units:
                 illegal_units = max(illegal_units, units - allowed_units)
                 reasons.append('buildings too tall')
+                color += Color(hex='#67cb53')  # green
 
         if illegal_units > 0:
             illegals[units] += int(area)
@@ -130,7 +135,7 @@ def main():
                 'max_median_height': max_median_height,
                 'lot_sq_ft': area,
                 'minimum_lot_sq_ft': min_area,
-                'fill': color(illegal_units),
+                'fill': color.hex,
                 'reasons': ', '.join(reasons),
                 'year_built': int(prop.get('yrbuilt')) or 'unknown',
             }
