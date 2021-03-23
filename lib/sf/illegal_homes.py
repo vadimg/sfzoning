@@ -18,7 +18,7 @@ from colorutils import Color
 HEIGHT_BUFFER = 5
 
 # in sq ft, how much smaller should the lot size be than allowed to mark it as illegal
-AREA_BUFFER = 1
+AREA_BUFFER = 10
 
 # outer: https://vis4.net/palettes/#/4|s|c2343e,ffa9ff|ffffe0,ff005e,93003a|1|1
 # inner: https://vis4.net/palettes/#/3|s|dc5d7a,f083bb|ffffe0,ff005e,93003a|1|1
