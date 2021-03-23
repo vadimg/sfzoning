@@ -5,27 +5,33 @@ from shapely.geometry import shape
 from lib.calc.sf import units_per_density_limit, units_per_height, address
 from lib.calc import sq_ft
 from lib.results import Results
+from lib.fileutil import generated_path
 from lib.fileutil import load, dump
+
+from collections import defaultdict
 
 
 # in ft, how much taller should the building be than allowed to mark it as illegal
+# NOTE: height is not super accurate because it was done via a lidar scan from a
+# plane, so the buffer is bigger than what you might expect
 HEIGHT_BUFFER = 5
 
 # in sq ft, how much smaller should the lot size be than allowed to mark it as illegal
 AREA_BUFFER = 1
 
+# outer: https://vis4.net/palettes/#/4|s|c2343e,ffa9ff|ffffe0,ff005e,93003a|1|1
+# inner: https://vis4.net/palettes/#/3|s|dc5d7a,f083bb|ffffe0,ff005e,93003a|1|1
+COLORS = ['#c2343e', '#dc5d7a', '#e7709a', '#f083bb', '#ffa9ff']
+
+
 def color(illegal_homes):
-    # https://vis4.net/palettes/#/10|s|c43e5f,ff9bff|ffffe0,ff005e,93003a|1|1
-    COLORS = ['#c43e5f', '#cc496f', '#d45380', '#db5d91', '#e268a3', '#e872b5', '#ef7cc7', '#f486d9', '#fa91ec', '#ff9bff']
     if int(illegal_homes) >= len(COLORS):
         return COLORS[-1]
-    return COLORS[int(illegal_homes)]
+    return COLORS[int(illegal_homes) - 1]
 
 
 def main():
-    filename = sys.argv[1]
-
-    features = load(filename)
+    features = load(generated_path('sf/lot_building_zoning.geojson'))
 
     r = Results()
     r.num_buildings = len(features)
@@ -35,6 +41,7 @@ def main():
     r.num_units_in_illegal_building = 0
     illegal_homes = []
     nozones = []
+    illegals = defaultdict(int)
     for i, obj in enumerate(features):
         print(i + 1, '/', len(features))
         prop = obj['properties']
@@ -69,7 +76,6 @@ def main():
                              prop.get('buildings') else 0)
 
         illegal_units = 0
-
         reasons = []
 
         if area + AREA_BUFFER < min_area:
@@ -82,12 +88,34 @@ def main():
 
 
         if max_median_height - HEIGHT_BUFFER > zoning['height']:
-            illegal_units = max(illegal_units, units - int(units *
-                                                           zoning['height'] /
-                                                           max_median_height))
-            reasons.append('buildings too tall')
+            total_building_volume = sum((float(b['properties']['hgt_mediancm']) /
+                                         30.48) *
+                                        sq_ft(shape(b['geometry'])) for b in
+                                        prop['buildings'])
+
+            # calulate how many units each building would allow if its height
+            # were chopped off at the zoning height (assuming even density of
+            # units per building volume for each lot - definitely an incorrect
+            # assumption but it's the best guess we can make)
+            allowed_units = 0
+            for b in prop['buildings']:
+                building_height = float(b['properties']['hgt_mediancm']) / 30.48
+
+                building_area = sq_ft(shape(b['geometry']))
+                units_proportion = units * building_area * building_height / total_building_volume
+
+                if building_height - HEIGHT_BUFFER > zoning['height']:
+                    allowed_units += units_proportion * zoning['height'] / building_height
+                else:
+                    allowed_units += units_proportion
+
+            allowed_units = int(round(allowed_units))
+            if allowed_units < units:
+                illegal_units = max(illegal_units, units - allowed_units)
+                reasons.append('buildings too tall')
 
         if illegal_units > 0:
+            illegals[units] += int(area)
             r.num_illegal_buildings += 1
             r.num_illegal_homes += illegal_units
             r.num_units_in_illegal_building += units
@@ -104,10 +132,12 @@ def main():
                 'minimum_lot_sq_ft': min_area,
                 'fill': color(illegal_units),
                 'reasons': ', '.join(reasons),
+                'year_built': int(prop.get('yrbuilt')) or 'unknown',
             }
             illegal_homes.append(obj)
 
     print(r.results())
+    print(illegals)
 
     assert not nozones
     dump('generated/sf/illegal_homes.geojson', illegal_homes)
