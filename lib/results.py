@@ -10,6 +10,9 @@ class Results(object):
     def __setattr__(self, key, val):
         self._dict[key] = val
 
+    def asdict(self):
+        return self._dict
+
     def results(self):
         res = []
         for k, v in self._dict.items():

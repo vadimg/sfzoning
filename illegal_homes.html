@@ -30,8 +30,11 @@
   background-color: rgba(0,0,0,0.33);
 }
 
-h1, h2 {
-  background-color: #EBE7E1;
+#header {
+  background-color: #262626;
+  color: #fff;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
+  z-index: 1;
   text-align: center;
 }
 
@@ -55,10 +58,11 @@ h1, h2 {
 }
 
 .legend {
-  background-color: #fff;
+  background-color: #262626;
+  color: #ddd;
   border-radius: 3px;
   bottom: 30px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: -1px 1px 2px rgba(255, 255, 255, 0.1);
   font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
   padding: 10px;
   position: absolute;
@@ -171,7 +175,7 @@ h1, h2 {
     <div class="fineprint section" id="fineprint"></div>
   </div>
 
-  <div id="header-template">Apartment buildings are illegal to build in {{ round apt_illegal_pct 0 }}% of {{ city }}</div>
+  <div id="header-template">{{ round num_illegal_homes 0 }}% of the homes in San Francisco would be illegal to build today</div>
   <div id="fineprint-template">
     <p>"Apartment building" is defined to be a building with 3 or more homes. It is illegal to build a building with 5 or more homes in {{ round apt5_illegal_pct 0 }}% of {{ city }}.
     <p>{{ commas lot_size }} sq ft is a typical lot size in {{ city }}
@@ -183,12 +187,6 @@ h1, h2 {
     <p>You can see why new development is concentrated in the Mission, Soma, and Tenderloin neighborhoods
     <p>Data from <a href="http://propertymap.sfplanning.org/" target="_blank">SF gov</a>. Code on <a href="https://github.com/vadimg/sfzoning" target="_blank">Github</a>.
     {{/compare}}
-
-    {{#compare city "==" "Mountain View" }}
-    <p>Percentages <em>exclude</em> parks and open space.</p>
-    <p>Data from <a href="https://data-mountainview.opendata.arcgis.com/datasets/f9aced0c78b446f99d43653512b402d6_0/data?geometry=-122.203%2C37.378%2C-121.956%2C37.426&page=2" target="_blank">City of Mountain View</a>. Code on <a href="https://github.com/vadimg/sfzoning" target="_blank">Github</a>.
-    {{/compare}}
-
   </div>
   <div id="popup-template">
     <h3><a href="https://www.google.com/maps/place/{{ address }} San Francisco, CA" target="_blank">{{ address }}</a></h3>
@@ -342,25 +340,13 @@ window.onhashchange = function() {
   location.reload();
 };
 
-$.getJSON('generated/' + cityCode + '/key_data.json', function(keyData) {
-  window.document.title = keyData.city + ' ' + window.document.title;
+$.getJSON('generated/sf/illegal_homes_key_data.json', function(keyData) {
   map.setZoom(keyData.zoom);
   map.setCenter(keyData.center);
 
-  document.getElementById('legend').insertAdjacentHTML('beforeend', legendTemplate({
-        lot_size: keyData.lot_size,
-        city: keyData.city,
-  }));
-  document.getElementById('header').insertAdjacentHTML('beforeend', headerTemplate({
-        lot_size: keyData.lot_size,
-        apt_illegal_pct: keyData.apt_illegal_pct,
-        city: keyData.city,
-  }));
-  document.getElementById('fineprint').insertAdjacentHTML('beforeend', fineprintTemplate({
-        lot_size: keyData.lot_size,
-        apt5_illegal_pct: keyData.apt5_illegal_pct,
-        city: keyData.city,
-  }));
+  // document.getElementById('legend').insertAdjacentHTML('beforeend', legendTemplate(keyData));
+  document.getElementById('header').insertAdjacentHTML('beforeend', headerTemplate(keyData));
+  // document.getElementById('fineprint').insertAdjacentHTML('beforeend', fineprintTemplate(keyData));
 
   map.on('load', function () {
     map.addLayer({
@@ -390,6 +376,7 @@ $.getJSON('generated/' + cityCode + '/key_data.json', function(keyData) {
 
       var legend = document.getElementById('legend-data');
 
+      return;
       keyData.key.forEach(function(data) {
         var roundedPercentage = Math.round(10*data['percentage'])/10;
         if (roundedPercentage == 0) {
