@@ -17,6 +17,7 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+<script src="http://mozilla.github.io/nunjucks/files/nunjucks.min.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
 <link href="https://www.mapbox.com/base/latest/base.css" rel="stylesheet" />
 <style>
@@ -62,7 +63,7 @@
   color: #ddd;
   border-radius: 3px;
   bottom: 30px;
-  box-shadow: -1px 1px 2px rgba(255, 255, 255, 0.1);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
   padding: 10px;
   position: absolute;
@@ -126,13 +127,6 @@
   margin-right: 5px;
 }
 
-.legend .color-explanation {
-  margin-bottom: 10px;
-}
-.legend .color-explanation p {
-  margin: -5px 0;
-}
-
 .legend .fineprint p {
   font-size: 10px;
   color: gray;
@@ -158,24 +152,16 @@
       </svg>
     </div>
   </div>
-  <div id="legend" class="legend"></div>
+  <div id="legend" class="legend">
+    <h3>Numer of illegal homes per parcel</h3>
+    <div id="legend-data"></div>
+    <div class="fineprint section" id="fineprint"></div>
+  </div>
 </div>
 
 <!-- templates -->
 <div style="display: none">
-  <div id="legend-template">
-    <h3>Max. Allowed Homes</h3>
-    <h5>(per {{ commas lot_size }} sq ft plot of land)</h5>
-    <div class="section color-explanation">
-      <p><strong style="color: red">Red</strong> means single-family or duplexes only
-      <p><strong style="color: orange">Orange</strong> means triplexes or fourplexes are legal
-      <p><strong style="color: green">Green</strong> means larger apartment buildings are legal
-    </div>
-    <div id="legend-data"></div>
-    <div class="fineprint section" id="fineprint"></div>
-  </div>
-
-  <div id="header-template">{{ round num_illegal_homes 0 }}% of the homes in San Francisco would be illegal to build today</div>
+  <div id="header-template">{{ (100 * num_illegal_homes / num_units) | round }}% of the homes in San Francisco would be illegal to build today</div>
   <div id="fineprint-template">
     <p>"Apartment building" is defined to be a building with 3 or more homes. It is illegal to build a building with 5 or more homes in {{ round apt5_illegal_pct 0 }}% of {{ city }}.
     <p>{{ commas lot_size }} sq ft is a typical lot size in {{ city }}
@@ -195,15 +181,15 @@
       <li class="list-group-item">Illegal because: {{ reasons }}</li>
       <li class="list-group-item">Homes: {{ units }}</li>
       <li class="list-group-item">Allowed Homes per Density Limit:
-        {{#compare allowed_units_density ">" 10000000 }}
+        {% if allowed_units_density > 10000000 %}
         No limit
-        {{else}}
-        {{round allowed_units_density 0}}
-        {{/compare}}
+        {% else %}
+        {{ allowed_units_density | round }}
+        {% endif %}
       </li>
-      <li class="list-group-item">Height: {{ round max_median_height 0 }} ft</li>
+      <li class="list-group-item">Height: {{ max_median_height | round }} ft</li>
       <li class="list-group-item">Allowed Height: {{ allowed_height }} ft</li>
-      <li class="list-group-item">Lot Size: {{ round lot_sq_ft 0 }} sq ft</li>
+      <li class="list-group-item">Lot Size: {{ lot_sq_ft | round }} sq ft</li>
       <li class="list-group-item">Minimum Allowed Lot Size: {{ minimum_lot_sq_ft }} sq ft</li>
       <li class="list-group-item">Zoning code: {{ zoning_code }}</li>
       <li class="list-group-item">Year built: {{ year_built }}</li>
@@ -217,15 +203,11 @@
       <span class="color-box" style="background-color: {{ color }}">
       </span>
       <span>
-        {{#compare num ">" 20 }}
-        more than 20
-        {{else}}{{#compare num "==" -1 }}
-        Open Space
-        {{else}}{{#compare num "==" 0 }}
-        0 (No housing)
-        {{else}}
-        {{ num }}
-        {{/compare}}{{/compare}}{{/compare}}
+        {% if homes >= 5 %}
+        5 or more
+        {% else %}
+        {{ homes }}
+        {% endif %}
       </span>
     </div>
   </div>
@@ -235,71 +217,29 @@
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoiZGltdmEiLCJhIjoiY2plYzhtMTM5MG5yazJ4bGE0OHZrcHpnZCJ9.u9hqKMLwpq-JHGyhAW2GeQ';
 
-Handlebars.registerHelper('round', function(num, places, options) {
-    if (arguments.length < 3) {
-      throw new Error("Handlebars Helper round needs 2 parameters");
-    }
-    var e = Math.pow(10, places);
+nunjucks.configure('views', { autoescape: true });
+var env = new nunjucks.Environment();
+
+env.addFilter('round', function(num, places) {
+    var e = Math.pow(10, places || 0);
     return Math.round(num*e) / e;
 });
 
-Handlebars.registerHelper('commas', function(num, options) {
-    if (arguments.length < 2) {
-      throw new Error("Handlebars Helper round needs 1 parameter");
-    }
-
+env.addFilter('commas', function(num) {
     var parts = num.toString().split(".");
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     return parts.join(".");
 });
 
-function htmlDecode(input)
-{
-  var doc = new DOMParser().parseFromString(input, "text/html");
-  return doc.documentElement.textContent;
+function compile(elemId) {
+  var html = document.getElementById(elemId).innerHTML;
+
+  // unescape < and > symbols
+  html = html.replace(/&lt;/g, '<');
+  html = html.replace(/&gt;/g, '>');
+
+  return nunjucks.compile(html, env);
 }
-
-Handlebars.registerHelper('compare', function (lvalue, operator, rvalue, options) {
-
-    var operators, result;
-
-    if (arguments.length < 3) {
-        throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
-    }
-
-    if (options === undefined) {
-        options = rvalue;
-        rvalue = operator;
-        operator = "===";
-    }
-
-    operator = htmlDecode(operator);
-
-    operators = {
-        '==': function (l, r) { return l == r; },
-        '===': function (l, r) { return l === r; },
-        '!=': function (l, r) { return l != r; },
-        '!==': function (l, r) { return l !== r; },
-        '<': function (l, r) { return l < r; },
-        '>': function (l, r) { return l > r; },
-        '<=': function (l, r) { return l <= r; },
-        '>=': function (l, r) { return l >= r; },
-        'typeof': function (l, r) { return typeof l == r; }
-    };
-
-    if (!operators[operator]) {
-        throw new Error("Handlerbars Helper 'compare' doesn't know the operator " + operator);
-    }
-
-    result = operators[operator](lvalue, rvalue);
-
-    if (result) {
-        return options.fn(this);
-    } else {
-        return options.inverse(this);
-    }
-
-});
 
 var map = new mapboxgl.Map({
     container: 'map', // container id
@@ -330,11 +270,12 @@ map.addControl(new mapboxgl.GeolocateControl({
     trackUserLocation: true
 }));
 
-var legendTemplate = Handlebars.compile(document.getElementById("legend-template").innerHTML);
-var popupTemplate = Handlebars.compile(document.getElementById("popup-template").innerHTML);
-var legendItemTemplate = Handlebars.compile(document.getElementById("legend-item-template").innerHTML);
+/*
 var fineprintTemplate = Handlebars.compile(document.getElementById("fineprint-template").innerHTML);
-var headerTemplate = Handlebars.compile(document.getElementById("header-template").innerHTML);
+*/
+var popupTemplate = compile("popup-template");
+var headerTemplate = compile("header-template");
+var legendItemTemplate = compile("legend-item-template");
 
 window.onhashchange = function() {
   location.reload();
@@ -344,8 +285,7 @@ $.getJSON('generated/sf/illegal_homes_key_data.json', function(keyData) {
   map.setZoom(keyData.zoom);
   map.setCenter(keyData.center);
 
-  // document.getElementById('legend').insertAdjacentHTML('beforeend', legendTemplate(keyData));
-  document.getElementById('header').insertAdjacentHTML('beforeend', headerTemplate(keyData));
+  document.getElementById('header').insertAdjacentHTML('beforeend', headerTemplate.render(keyData));
   // document.getElementById('fineprint').insertAdjacentHTML('beforeend', fineprintTemplate(keyData));
 
   map.on('load', function () {
@@ -370,23 +310,14 @@ $.getJSON('generated/sf/illegal_homes_key_data.json', function(keyData) {
 
         new mapboxgl.Popup()
             .setLngLat(e.lngLat)
-            .setHTML(popupTemplate(prop))
+            .setHTML(popupTemplate.render(prop))
             .addTo(map);
       });
 
       var legend = document.getElementById('legend-data');
 
-      return;
       keyData.key.forEach(function(data) {
-        var roundedPercentage = Math.round(10*data['percentage'])/10;
-        if (roundedPercentage == 0) {
-          return;
-        }
-        legend.insertAdjacentHTML('beforeend', legendItemTemplate({
-              num: Math.round(data['homes']*1000)/1000,
-              percentage: roundedPercentage.toFixed(1),
-              color: data['color']
-        }));
+        legend.insertAdjacentHTML('beforeend', legendItemTemplate.render(data));
       });
   });
 });

@@ -20,10 +20,11 @@ HEIGHT_BUFFER = 5
 # in sq ft, how much smaller should the lot size be than allowed to mark it as illegal
 AREA_BUFFER = 10
 
+# https://vis4.net/palettes/#/5|s|e180e2,e43668|ffffe0,ff005e,93003a|1|1
+COLORS = ['#e180e2', '#e56fc2', '#e75ea3', '#e64c85', '#e43668']
+
 
 def color(illegal_homes):
-    # https://vis4.net/palettes/#/5|s|e180e2,e43668|ffffe0,ff005e,93003a|1|1
-    COLORS = ['#e180e2', '#e56fc2', '#e75ea3', '#e64c85', '#e43668']
     if int(illegal_homes) >= len(COLORS):
         return COLORS[-1]
     return COLORS[int(illegal_homes) - 1]
@@ -137,17 +138,26 @@ def main():
     print(r.results())
     print(illegals)
 
-    key = {
+    key = []
+    for i, c in enumerate(COLORS):
+        key.append({
+            'homes': i + 1,
+            'color': c,
+            'percentage': 0,
+        })
+
+    key_data = {
         'center': [-122.42190766560782, 37.756856070821115],
         'zoom': 12.2,
+        'key': key,
     }
-    key.update(r.asdict())
+    key_data.update(r.asdict())
 
     assert not nozones
     dump('generated/sf/illegal_homes.geojson', illegal_homes)
 
     with open(generated_path('sf/illegal_homes_key_data.json'), 'w') as f:
-        json.dump(key, f)
+        json.dump(key_data, f)
 
 
 if __name__ == '__main__':
