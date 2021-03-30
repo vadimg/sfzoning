@@ -23,7 +23,7 @@
 
 body {
   margin: 0;
-  font: 15px 'Open Sans', sans-serif;
+  font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -72,12 +72,12 @@ body {
   border-radius: 3px;
   bottom: 30px;
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+  font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
   padding: 10px;
   position: absolute;
   right: 10px;
   z-index: 1;
-  width: 305px;
+  width: 350px;
   max-height: 550px;
   overflow: auto;
 }
@@ -93,15 +93,23 @@ body {
     -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
 }
 
+.legend {
+  font-size: 14px;
+  font-weight: 500;
+  color: #bbb;
+}
+
 .legend h3 {
-  margin: 5px;
-  font-size: 15px;
-  text-align: center;
+  margin-top: 15px;
+  margin-bottom: 4px;
+  font-size: 17px;
+  color: #eee;
 }
 
 .legend .color-box {
-  width: 20px;
-  height: 20px;
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
   display: inline-block;
   opacity: 0.8;
   text-align: center;
@@ -111,7 +119,9 @@ body {
 #legend-data {
   justify-content: space-between;
   display: flex;
-  margin: 10px;
+  margin-top: 10px;
+  margin-left: 17px;
+  margin-right: 17px;
 }
 
 .legend .section {
@@ -120,17 +130,19 @@ body {
   margin-right: 5px;
 }
 
-.legend .fineprint p {
-  font-size: 10px;
-  color: gray;
-  margin: 5px 0;
-  line-height: 10px;
+.legend ul {
+  margin: 0;
+  padding-left: 7px;
 }
 
 .legend li {
   list-style-type: disc;
   margin: 4px 0 4px 10px;
-  line-height: 15px;
+  line-height: 16px;
+}
+
+.legend p {
+  margin-top: 4px;
 }
 
 </style>
