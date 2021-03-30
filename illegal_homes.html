@@ -3,13 +3,9 @@
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120785721-1"></script>
 <script>
-  var cityCode = window.location.hash.substr(1) || 'sf';
-
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
-  gtag('config', 'UA-120785721-1', {'page_path': '/' + cityCode});
 </script>
 
 <title>Illegal Buildings in San Francisco</title>
@@ -99,11 +95,29 @@ body {
   color: #bbb;
 }
 
+.legend a {
+  color: #bbb;
+  text-decoration-style: solid;
+}
+
+.legend a:hover {
+  color: #e75ea3;
+}
+
 .legend h3 {
   margin-top: 15px;
   margin-bottom: 4px;
   font-size: 17px;
+  line-height: 18px;
   color: #eee;
+}
+
+.legend h2 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #eee;
+  text-align: center;
+  font-size: 22px;
 }
 
 .legend .color-box {
@@ -133,6 +147,7 @@ body {
 .legend ul {
   margin: 0;
   padding-left: 7px;
+  padding-right: 17px;
 }
 
 .legend li {
@@ -208,7 +223,40 @@ body {
   <div id="explainer-template">
     <h3>What's going on here?</h3>
     <p>These buildings aren't illegal to build today because of safety reasons or any construction deficiencies - they are only illegal due to regulations called zoning laws that San Francisco passed to restrict the density of housing in certain areas, mainly to keep poor minorities out of white neighborhoods.
-    <p>Starting in 1921, San Francisco has been steadily passing zoning laws to restrict housing construction in wealthy neighborhoods. This accelerated after 1968 when the Fair Housing Act banned explicit race discrimination. Because minorities were poorer than whites and dense housing such as apartments is usually cheaper than single-family homes, the goal was to ban the construction of housing that poor minorities could afford.
+    <p>Starting in <a target="_blank" href="https://archive.org/details/sf-zoning-1921">1921</a>, San Francisco has been steadily passing zoning laws to restrict housing construction in wealthy neighborhoods. This <a target="_blank" href="https://twitter.com/enf/status/999030803609899013">accelerated after 1968</a> when the <a target="_blank" href="https://en.wikipedia.org/wiki/Civil_Rights_Act_of_1968#Title_VIII%E2%80%93IX:_Fair_Housing_Act">Fair Housing Act</a> banned explicit race discrimination. Because minorities were poorer than whites and dense housing such as apartments is usually cheaper than single-family homes, the goal was to ban the construction of housing that poor minorities could afford.
+
+    <h3>How does San Francisco ban affordable housing?</h3>
+    <p>If your goal is to make housing as expensive as possible, the best way to do it is to require lots of land per home, because land in cities is very expensive. San Francisco does this in a multitude of ways, but I decided to focus on 3 of them:
+    <ul>
+      <li><strong>Minimum lot size</strong>: San Francisco mandates that a lot must be at least 2,500 square feet (or 4,000 sqft in some cases) in order to build a home on it. Since a <a target="_blank" href="https://www.zillow.com/homedetails/415-Ivy-St-San-Francisco-CA-94102/15078362_zpid/?">decent single-family home could be built on a 500 sqft lot</a>, and a <a target="_blank" href="https://www.zillow.com/homedetails/2325-Ulloa-St-San-Francisco-CA-94116/15123381_zpid/">very nice single-family home can be built on a 1,200 sqft lot</a>, the minimum lot size requirement greatly reduces the amount of homes that could be built in San Francisco and increases the price of each home.</li>
+      <li><strong>Density limits</strong>: San Francisco mandates explicit density limits, from prohibiting apartments entirely (<a target="_blank" href="http://sfzoning.deapthoughts.com">in 76% of the city</a>) to mandating a minimum lot size per apartment (almost everywhere else). The sole reason for these limits is to make housing more scarce and therefore more expensive. San Francisco limits density in many other ways, such as <a target="_blank" href="https://en.wikipedia.org/wiki/Floor_area_ratio">floor-to-area ratio</a>, <a target="_blank" href="https://en.wikipedia.org/wiki/Setback_(land_use)">setback requirements</a>, etc. but to keep things simple, I looked only at the minimum lot size per apartment for this map.</li>
+      <li><strong>Height limits</strong>: When land becomes expensive, developers can still create inexpensive homes by building multiple apartments on the same plot of land. Each apartment has to pay for only a fraction of the land cost, which can <a target="_blank" href="https://www.rent.com/blog/single-family-home-vs-apartment/">make apartments significantly cheaper than single-family homes</a>. The taller the apartment building, the less significant the cost of the land becomes, so San Francisco limits this savings by limiting the height of new buildings to 40 feet in most of the city.</li>
+    </ul>
+    <p>Whenever San Francisco creates a new restriction, homes that already exist are grandfathered in rather than demolished. That's where all these "homes illegal to build today" come from.
+
+    <h3>How can you say San Francisco purposely bans affordable housing? All its leaders constantly talk about building more affordable housing!</h3>
+    <p>Sorry to break it to you, but politicians lie. Think about it: they say they want more affordable housing all the time, yet very little affordable housing gets built, and <a target="_blank" href="https://sf.curbed.com/2019/3/15/18267525/san-francisco-zumper-most-expensive-worldwide">San Francisco remains</a> the most expensive city in the world. Meanwhile, <a target="_blank" href="https://web.archive.org/web/20210102184055/https://houston.craigslist.org/apa/d/houston-free-wi-fi-in-clubhouse-and/7253671989.html">you can rent a nice apartment in Houston for $600/month</a>. San Francisco politicians blame all sorts of scapegoats for this: techies, greedy developers, speculators, capitalism, etc. but Houston is also very capitalist, its developers are at least as greedy, and it even has a <a target="_blank" href="https://www.erieri.com/salary/job/petroleum-engineer/united-states/texas/houston">booming industry that pays engineers high salaries</a> - the main difference is that Houston doesn't have zoning laws.
+
+    <h3>But how can you say that zoning laws are racist? San Francisco always tries to elevate the concerns of BIPOC communities!</h3>
+    <p>These laws were originally created for racist reasons - that is a <a target="_blank" href="https://www.amazon.com/Color-Law-Forgotten-Government-Segregated-ebook/dp/B01M8IWJT2/">well-documented fact</a>, despite <a target="_blank" href="https://archive.is/A7kR1">what some San Francisco politicians claim</a>. These days, supporters of zoning probably don't have explicitly racist motivations. Instead, they are concerned about traffic, parking, shadows, "neighborhood character", or just don't like change and aren't personally affected by high rent.
+    <p>Still, even if the intent of zoning laws isn't racist, their effect has racist impacts. <a target="_blank" href="https://thebolditalic.com/the-dream-vs-reality-on-being-black-in-san-francisco-8a77f2176d1a">San Francisco's Black population declined from 13% of the city in the 1970s to 5.5% today</a>. Many of these Black families moved to Houston, <a target="_blank" href="https://webcache.googleusercontent.com/search?q=cache:OPBV3wCfme4J:https://www.latimes.com/opinion/op-ed/la-oe-0501-renn-reverse-great-migration-20160501-story.html+&cd=48&hl=en&ct=clnk&gl=us">which added 100,000 Black residents from 2010 to 2015</a>, and are now <a target="_blank" href="https://www.census.gov/quickfacts/fact/table/houstoncitytexas/PST045219">23% of the city's population</a>.
+
+    <h3>But all these organizations of low-income minorities claim that zoning laws protect them from displacement! Are you saying they're liars?</h3>
+    <p>No, I don't think they are liars. In 2009, San Francisco enacted the <a target="_blank" href="https://sfplanning.org/eastern-neighborhoods-plans">Eastern Neighborhoods Plan</a>, which relaxed some zoning restrictions in poor neighborhoods only. Because tenants did not have adequate protection, and because the relaxation of these restrictions increased the upside of evicting rent-controlled tenants and redeveloping the property, areas such as the Mission experienced a wave of no-fault evictions and displacement of entire communities.
+    <p>Since then, tenant protections have been significantly strengthened, and newer proposals to relax zoning restrictions include even better protections, but various tenant groups understandably don't trust that they will be protected.
+    <p>But we don't need to loosen restrictions even more in poor neighborhoods; <a target="_blank" href="https://sfzoning.deapthoughts.com/">the vast majority of San Francisco is much more restricted than what is allowed in poor neighborhoods</a>. Just allowing the same type of buildings in richer areas as we do in poor areas is more than enough to end the housing crisis.
+
+    <h3>What can I do to fix this?</h3>
+    <p>As far as I know, there is only one organization in San Francisco working to fix this: <a target="_blank" href="https://yimbyaction.org/">YIMBY Action</a>. At the California state level, <a target="_blank" href="https://cayimby.org/">California YIMBY</a> is working on fixing zoning laws statewide. Joining these organizations will teach you how to push your local politicians to make reforms to zoning laws.
+    <p>Some places such as <a target="_blank" href="https://www.berkeleyside.com/2021/02/24/berkeley-denounces-racist-history-of-single-family-zoning-begins-2-year-process-to-change-general-plan">Berkeley</a>, <a target="_blank" href="https://www.nytimes.com/2018/12/13/us/minneapolis-single-family-zoning.html">Minneapolis</a>, and the <a target="_blank" href="https://www.npr.org/2019/07/01/737798440/oregon-legislature-votes-to-essentially-ban-single-family-zoning">entire state of Oregon</a> have already taken steps to <a target="_blank" href="https://www.csmonitor.com/USA/Politics/2021/0308/California-housing-crunch-Is-the-answer-to-end-single-family-zoning">reform these racist laws</a>, but we can't declare victory yet. <a target="_blank" href="https://www.nytimes.com/interactive/2019/06/18/upshot/cities-across-america-question-single-family-zoning.html">Most American cities still have zoning laws that exclude poor people</a>; we have a lot of work left to do.
+
+    <h2>FAQ</h2>
+
+    <h3>Where did you get this data?</h3>
+    <p>The data comes from <a target="_blank" href="https://data.sfgov.org/browse?category=Housing+and+Buildings">San Francisco's Open Data</a>. The code used to create this map is on <a target="_blank" href="https://github.com/vadimg/sfzoning">Github</a>.
+
+    <h3>I notice there's a building built last year that you claim is illegal to build. How is that possible?</h3>
+    <p>Well-connected developers can apply for a <a target="_blank" href="https://en.wikipedia.org/wiki/Special-use_permit">conditional use permit</a> to get a per-project exemption from zoning laws. The city does not need consistent reasons for granting or rejecting these permits, so this is an easy way for politicians to grant special favors to friendly developers.
   </div>
   <div id="legend-item-template">
     <div class="color-box" style="background-color: {{ color }}">
@@ -311,7 +359,7 @@ $.getJSON('generated/sf/illegal_homes_key_data.json', function(keyData) {
         'type': 'fill',
         'source': {
             'type': 'geojson',
-            'data': 'generated/' + cityCode + '/illegal_homes.geojson'
+            'data': 'generated/sf/illegal_homes.geojson'
         },
         'paint': {
             'fill-opacity': 0.7,
