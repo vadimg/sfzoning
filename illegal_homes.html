@@ -19,8 +19,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
 <script src="http://mozilla.github.io/nunjucks/files/nunjucks.min.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
-<link href="https://www.mapbox.com/base/latest/base.css" rel="stylesheet" />
 <style>
+
+body {
+  margin: 0;
+  font: 15px 'Open Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
 
 #loader {
   display: flex;
@@ -33,10 +38,13 @@
 
 #header {
   background-color: #262626;
-  color: #fff;
+  color: #eee;
   box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
   z-index: 1;
   text-align: center;
+  font-size: 24px;
+  margin: 0;
+  padding: 4px;
 }
 
 #container {
@@ -86,39 +94,24 @@
 }
 
 .legend h3 {
-  margin: 0;
+  margin: 5px;
+  font-size: 15px;
   text-align: center;
-}
-
-.legend h5 {
-  margin: -3px 0 10px;
-  text-align: center;
-  font-size: 10px;
-}
-
-.legend .legend-item {
-  display: block;
-  margin-top: 5px;
-}
-
-.legend-item span {
-  vertical-align: top;
-}
-
-.legend-item .percentage {
-  width: 50px;
-  text-align: right;
-  display: inline-block;
-  font-size: 10px;
-  color: lightgray;
 }
 
 .legend .color-box {
   width: 20px;
   height: 20px;
   display: inline-block;
-  margin-right: 5px;
-  opacity: 0.7;
+  opacity: 0.8;
+  text-align: center;
+  color: #000;
+}
+
+#legend-data {
+  justify-content: space-between;
+  display: flex;
+  margin: 10px;
 }
 
 .legend .section {
@@ -134,11 +127,17 @@
   line-height: 10px;
 }
 
+.legend li {
+  list-style-type: disc;
+  margin: 4px 0 4px 10px;
+  line-height: 15px;
+}
+
 </style>
 </head>
 <body>
 <div id="container">
-  <h2 id="header"></h2>
+  <h1 id="header"></h1>
   <div id="map">
     <div id="loader">
       <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="80px" height="80px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
@@ -153,26 +152,25 @@
     </div>
   </div>
   <div id="legend" class="legend">
-    <h3>Numer of illegal homes per parcel</h3>
-    <div id="legend-data"></div>
-    <div class="fineprint section" id="fineprint"></div>
+    <div class="section">
+      <h3>Number of illegal homes per parcel</h3>
+      <div id="legend-data"></div>
+    </div>
+    <div class="fun-facts section" id="fun-facts"></div>
+    <div class="explainer section" id="explainer"></div>
   </div>
 </div>
 
 <!-- templates -->
 <div style="display: none">
-  <div id="header-template">{{ (100 * num_illegal_homes / num_units) | round }}% of the homes in San Francisco would be illegal to build today</div>
-  <div id="fineprint-template">
-    <p>"Apartment building" is defined to be a building with 3 or more homes. It is illegal to build a building with 5 or more homes in {{ round apt5_illegal_pct 0 }}% of {{ city }}.
-    <p>{{ commas lot_size }} sq ft is a typical lot size in {{ city }}
-
-    {{#compare city "==" "San Francisco" }}
-    <p>Assumes 2.5 apartments per 10 ft of height per {{ commas lot_size }} sq ft
-    <p>Calculations include <a href="http://sf-planning.org/accessory-dwelling-units" target="_blank">waiverless ADUs</a> and <a href="http://library.amlegal.com/nxt/gateway.dll/California/planning/article12dimensionsareasandopenspaces?f=templates$fn=default.htm$3.0$vid=amlegal:sanfrancisco_ca$anc=JD_145.4">ground-floor retail requirements</a>
-    <p>Many apartment buildings already exist in the red and orange areas but would be illegal to build today
-    <p>You can see why new development is concentrated in the Mission, Soma, and Tenderloin neighborhoods
-    <p>Data from <a href="http://propertymap.sfplanning.org/" target="_blank">SF gov</a>. Code on <a href="https://github.com/vadimg/sfzoning" target="_blank">Github</a>.
-    {{/compare}}
+  <div id="header-template">{{ (100 * num_illegal_lots / num_lots) | round }}% of the buildings in San Francisco would be illegal to build today</div>
+  <div id="fun-facts-template">
+    <h3>Fun Facts</h3>
+    <ul>
+      <li>{{ (100 * num_illegal_lots / num_lots) | round }}% of the buildings in San Francisco would be illegal to build today</li>
+      <li>{{ (100 * num_units_in_illegal_building / num_units) | round }}% of the homes in San Francisco exist in buildings which would be illegal to build today</li>
+      <li>To comply with today's laws, {{ num_illegal_units | commas }} homes would have to be destroyed, evicting around {{ (2.36 * num_illegal_units) | round(-4) | round | commas }} people.</li>
+    </ul>
   </div>
   <div id="popup-template">
     <h3><a href="https://www.google.com/maps/place/{{ address }} San Francisco, CA" target="_blank">{{ address }}</a></h3>
@@ -195,20 +193,18 @@
       <li class="list-group-item">Year built: {{ year_built }}</li>
     </ul>
   </div>
+  <div id="explainer-template">
+    <h3>What's going on here?</h3>
+    <p>These buildings aren't illegal to build today because of safety reasons or any construction deficiencies - they are only illegal due to regulations called zoning laws that San Francisco passed to restrict the density of housing in certain areas, mainly to keep poor minorities out of white neighborhoods.
+    <p>Starting in 1921, San Francisco has been steadily passing zoning laws to restrict housing construction in wealthy neighborhoods. This accelerated after 1968 when the Fair Housing Act banned explicit race discrimination. Because minorities were poorer than whites and dense housing such as apartments is usually cheaper than single-family homes, the goal was to ban the construction of housing that poor minorities could afford.
+  </div>
   <div id="legend-item-template">
-    <div class="legend-item">
-      <span class="percentage">
-      {{ percentage }}%
-      </span>
-      <span class="color-box" style="background-color: {{ color }}">
-      </span>
-      <span>
-        {% if homes >= 5 %}
-        5 or more
-        {% else %}
-        {{ homes }}
-        {% endif %}
-      </span>
+    <div class="color-box" style="background-color: {{ color }}">
+      {% if num >= 5 %}
+      5+
+      {% else %}
+      {{ num }}
+      {% endif %}
     </div>
   </div>
 </div>
@@ -270,23 +266,32 @@ map.addControl(new mapboxgl.GeolocateControl({
     trackUserLocation: true
 }));
 
-/*
-var fineprintTemplate = Handlebars.compile(document.getElementById("fineprint-template").innerHTML);
-*/
 var popupTemplate = compile("popup-template");
 var headerTemplate = compile("header-template");
 var legendItemTemplate = compile("legend-item-template");
+var funFactsTemplate = compile("fun-facts-template");
+var explainerTemplate = compile("explainer-template");
 
 window.onhashchange = function() {
   location.reload();
 };
 
 $.getJSON('generated/sf/illegal_homes_key_data.json', function(keyData) {
-  map.setZoom(keyData.zoom);
-  map.setCenter(keyData.center);
+  map.fitBounds([
+    [-122.5203765565384, 37.700033803604006],
+    [-122.30764514054817, 37.813050877104246],
+  ]);
 
   document.getElementById('header').insertAdjacentHTML('beforeend', headerTemplate.render(keyData));
-  // document.getElementById('fineprint').insertAdjacentHTML('beforeend', fineprintTemplate(keyData));
+  document.title = headerTemplate.render(keyData);
+  document.getElementById('fun-facts').insertAdjacentHTML('beforeend', funFactsTemplate.render(keyData));
+  document.getElementById('explainer').insertAdjacentHTML('beforeend', explainerTemplate.render(keyData));
+
+  var legend = document.getElementById('legend-data');
+
+  keyData.key.forEach(function(data) {
+    legend.insertAdjacentHTML('beforeend', legendItemTemplate.render(data));
+  });
 
   map.on('load', function () {
     map.addLayer({
@@ -302,23 +307,17 @@ $.getJSON('generated/sf/illegal_homes_key_data.json', function(keyData) {
         }
     });
 
-      // When a click event occurs on a feature in the states layer, open a popup at the
-      // location of the click, with description HTML from its properties.
-      map.on('click', 'zones-layer', function (e) {
-        var prop = e.features[0].properties;
-        prop['lot_size'] = keyData.lot_size;
+    // When a click event occurs on a feature in the states layer, open a popup at the
+    // location of the click, with description HTML from its properties.
+    map.on('click', 'zones-layer', function (e) {
+      var prop = e.features[0].properties;
+      prop['lot_size'] = keyData.lot_size;
 
-        new mapboxgl.Popup()
-            .setLngLat(e.lngLat)
-            .setHTML(popupTemplate.render(prop))
-            .addTo(map);
-      });
-
-      var legend = document.getElementById('legend-data');
-
-      keyData.key.forEach(function(data) {
-        legend.insertAdjacentHTML('beforeend', legendItemTemplate.render(data));
-      });
+      new mapboxgl.Popup()
+          .setLngLat(e.lngLat)
+          .setHTML(popupTemplate.render(prop))
+          .addTo(map);
+    });
   });
 });
 

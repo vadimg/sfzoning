@@ -34,14 +34,16 @@ def main():
     features = load(generated_path('sf/lot_building_zoning.geojson'))
 
     r = Results()
-    r.num_buildings = len(features)
+    r.num_lots = len(features)
     r.num_units = 0
-    r.num_illegal_buildings = 0
-    r.num_illegal_homes = 0
+    r.num_illegal_lots = 0
+    r.num_illegal_units = 0
     r.num_units_in_illegal_building = 0
     illegal_homes = []
     nozones = []
     illegals = defaultdict(int)
+    reason_count = defaultdict(int)
+    lot_sizez = {}
     for i, obj in enumerate(features):
         print(i + 1, '/', len(features))
         prop = obj['properties']
@@ -79,11 +81,15 @@ def main():
         reasons = []
 
         if area + AREA_BUFFER < min_area:
+            lot_sizez[area] = obj
             illegal_units = units
+            reason_count['lot too small'] += units
             reasons.append('lot too small')
 
         if units > allowed_units_density:
+            old_illegal_units = illegal_units
             illegal_units = max(illegal_units, units - int(allowed_units_density))
+            reason_count['too dense'] += illegal_units - old_illegal_units
             reasons.append('too dense')
 
         if max_median_height - HEIGHT_BUFFER > zoning['height']:
@@ -110,13 +116,15 @@ def main():
 
             allowed_units = int(round(allowed_units))
             if allowed_units < units:
+                old_illegal_units = illegal_units
                 illegal_units = max(illegal_units, units - allowed_units)
-                reasons.append('buildings too tall')
+                reason_count['too tall'] += illegal_units - old_illegal_units
+                reasons.append('too tall')
 
         if illegal_units > 0:
-            illegals[units] += int(area)
-            r.num_illegal_buildings += 1
-            r.num_illegal_homes += illegal_units
+            illegals[color(illegal_units)] += illegal_units
+            r.num_illegal_lots += 1
+            r.num_illegal_units += illegal_units
             r.num_units_in_illegal_building += units
 
             obj['properties'] = {
@@ -129,27 +137,24 @@ def main():
                 'max_median_height': max_median_height,
                 'lot_sq_ft': area,
                 'minimum_lot_sq_ft': min_area,
-                'fill': color(units),
+                'fill': color(illegal_units),
                 'reasons': ', '.join(reasons),
                 'year_built': int(prop.get('yrbuilt')) or 'unknown',
             }
             illegal_homes.append(obj)
 
     print(r.results())
-    print(illegals)
 
     key = []
     for i, c in enumerate(COLORS):
         key.append({
-            'homes': i + 1,
+            'num': i + 1,
             'color': c,
-            'percentage': 0,
         })
 
     key_data = {
-        'center': [-122.42190766560782, 37.756856070821115],
-        'zoom': 12.2,
         'key': key,
+        'reason_counts': reason_count,
     }
     key_data.update(r.asdict())
 
@@ -158,6 +163,8 @@ def main():
 
     with open(generated_path('sf/illegal_homes_key_data.json'), 'w') as f:
         json.dump(key_data, f)
+
+    import pdb;pdb.set_trace()
 
 
 if __name__ == '__main__':
