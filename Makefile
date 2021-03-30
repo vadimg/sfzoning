@@ -10,9 +10,14 @@ clean_maps:
 
 sf: generated/sf/density_map.geojson
 
+sf_illegal: generated/sf/illegal_homes.geojson
+
 prop_e: generated/sf/prop_e.geojson
 
 mountain_view: generated/mountain_view/density_map.geojson
+
+generated/sf/illegal_homes.geojson: generated/sf/lot_building_zoning.geojson
+	ENV/bin/python ./lib/sf/illegal_homes.py
 
 generated/sf/density_map.geojson: generated/sf/zoning_height.geojson
 	ENV/bin/python ./lib/sf/map.py

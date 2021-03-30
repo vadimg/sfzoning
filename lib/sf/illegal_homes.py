@@ -55,9 +55,6 @@ def main():
         units = int(prop['resunits'])
         r.num_units += units
 
-        if i % 1000 == 0:
-            print(prop)
-
         if units == 0:
             continue
 
@@ -163,8 +160,6 @@ def main():
 
     with open(generated_path('sf/illegal_homes_key_data.json'), 'w') as f:
         json.dump(key_data, f)
-
-    import pdb;pdb.set_trace()
 
 
 if __name__ == '__main__':
