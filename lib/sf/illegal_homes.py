@@ -41,7 +41,6 @@ def main():
     r.num_units_in_illegal_building = 0
     illegal_homes = []
     nozones = []
-    illegals = defaultdict(int)
     reason_count = defaultdict(int)
     lot_sizez = {}
     for i, obj in enumerate(features):
@@ -84,9 +83,8 @@ def main():
             reasons.append('lot too small')
 
         if units > allowed_units_density:
-            old_illegal_units = illegal_units
             illegal_units = max(illegal_units, units - int(allowed_units_density))
-            reason_count['too dense'] += illegal_units - old_illegal_units
+            reason_count['too dense'] += units - int(allowed_units_density)
             reasons.append('too dense')
 
         if max_median_height - HEIGHT_BUFFER > zoning['height']:
@@ -113,13 +111,11 @@ def main():
 
             allowed_units = int(round(allowed_units))
             if allowed_units < units:
-                old_illegal_units = illegal_units
                 illegal_units = max(illegal_units, units - allowed_units)
-                reason_count['too tall'] += illegal_units - old_illegal_units
+                reason_count['too tall'] += units - allowed_units
                 reasons.append('too tall')
 
         if illegal_units > 0:
-            illegals[color(illegal_units)] += illegal_units
             r.num_illegal_lots += 1
             r.num_illegal_units += illegal_units
             r.num_units_in_illegal_building += units
