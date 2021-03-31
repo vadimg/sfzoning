@@ -48,7 +48,7 @@ a:hover {
   box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
   z-index: 1;
   text-align: center;
-  font-size: 24px;
+  font-size: 22px;
   margin: 0;
   padding: 4px;
 }
@@ -250,12 +250,12 @@ a:hover {
 
 <!-- templates -->
 <div style="display: none">
-  <div id="header-template">{{ (100 * num_illegal_lots / num_lots) | round }}% of the buildings in San Francisco would be illegal to build today</div>
+  <div id="header-template">{{ (100 * num_units_in_illegal_building / num_units) | round }}% of San Francisco homes are in buildings that would be illegal to build today</div>
   <div id="fun-facts-template">
     <h3>Fun Facts</h3>
     <ul>
       <li>{{ (100 * num_illegal_lots / num_lots) | round }}% of the buildings in San Francisco would be illegal to build today</li>
-      <li>{{ (100 * num_units_in_illegal_building / num_units) | round }}% of the homes in San Francisco exist in buildings which would be illegal to build today</li>
+      <li>{{ (100 * num_units_in_illegal_building / num_units) | round }}% of the homes in San Francisco are in buildings that would be illegal to build today</li>
       <li>To comply with today's laws, {{ num_illegal_units | commas }} homes would have to be destroyed, evicting around {{ (2.36 * num_illegal_units) | round(-4) | round | commas }} people.</li>
     </ul>
   </div>
