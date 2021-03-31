@@ -85,7 +85,10 @@ def main():
         if units > allowed_units_density:
             illegal_units = max(illegal_units, units - int(allowed_units_density))
             reason_count['too dense'] += units - int(allowed_units_density)
-            reasons.append('too dense')
+            if allowed_units_density == 0:
+                reasons.append('no housing allowed here')
+            else:
+                reasons.append('too dense')
 
         if max_median_height - HEIGHT_BUFFER > zoning['height']:
             total_building_volume = sum((float(b['properties']['hgt_mediancm']) /
