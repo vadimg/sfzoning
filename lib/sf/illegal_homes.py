@@ -1,8 +1,6 @@
 import sys
 import json
 
-from shapely.geometry import shape
-
 from lib.calc.sf import units_per_density_limit, units_per_height, address
 from lib.calc import sq_ft
 from lib.results import Results
@@ -18,7 +16,7 @@ from collections import defaultdict
 HEIGHT_BUFFER = 5
 
 # in sq ft, how much smaller should the lot size be than allowed to mark it as illegal
-AREA_BUFFER = 10
+AREA_BUFFER = 100
 
 # https://vis4.net/palettes/#/5|s|e180e2,e43668|ffffe0,ff005e,93003a|1|1
 COLORS = ['#e180e2', '#e56fc2', '#e75ea3', '#e64c85', '#e43668']
@@ -57,8 +55,7 @@ def main():
         if units == 0:
             continue
 
-        s = shape(obj['geometry'])
-        area = sq_ft(s)
+        area = sq_ft(obj['geometry'])
 
         min_area = 4000 if zoning['zoning'] == 'RH-1(D)' else 2500
 
@@ -93,7 +90,7 @@ def main():
         if max_median_height - HEIGHT_BUFFER > zoning['height']:
             total_building_volume = sum((float(b['properties']['hgt_mediancm']) /
                                          30.48) *
-                                        sq_ft(shape(b['geometry'])) for b in
+                                        sq_ft(b['geometry']) for b in
                                         prop['buildings'])
 
             # calulate how many units each building would allow if its height
@@ -104,7 +101,7 @@ def main():
             for b in prop['buildings']:
                 building_height = float(b['properties']['hgt_mediancm']) / 30.48
 
-                building_area = sq_ft(shape(b['geometry']))
+                building_area = sq_ft(b['geometry'])
                 units_proportion = units * building_area * building_height / total_building_volume
 
                 if building_height - HEIGHT_BUFFER > zoning['height']:

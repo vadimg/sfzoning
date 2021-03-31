@@ -34,7 +34,7 @@ def main():
         intersecting = index.intersecting(lot_poly)
 
         obj['properties']['address'] = address(obj['properties'])
-        obj['properties']['sqft'] = sq_ft(lot_poly)
+        obj['properties']['sqft'] = sq_ft(obj['geometry'])
 
         intersects = []
         for zone in intersecting:

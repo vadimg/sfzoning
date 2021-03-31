@@ -2,7 +2,6 @@ import sys
 import os
 import re
 from collections import defaultdict
-from shapely.geometry import shape
 import ujson as json
 
 from lib.fileutil import load, dump, generated_path, data_path
@@ -49,8 +48,7 @@ def main():
             homes_zoning = units_per_density_limit(zoning_code,
                                                    waiverless_adus=False)
         except NewZoneDetected:
-            s = shape(o['geometry'])
-            area = sq_ft(s)
+            area = sq_ft(o['geometry'])
             new_zones[zoning_code] += area
             homes_zoning = 0
             print(prop)

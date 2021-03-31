@@ -4,6 +4,7 @@ from shapely.geometry import shape
 
 import shapely.ops as ops
 import pyproj
+from area import area as pyarea
 
 METER_TO_FEET = 3.280839895
 SQ_METER_TO_SQ_FEET = METER_TO_FEET ** 2
@@ -53,17 +54,18 @@ def color(units):
 
 
 def sq_ft(geom):
-    geom_area = ops.transform(
-        functools.partial(
-            pyproj.transform,
-            pyproj.Proj(init='EPSG:4326'),
-            pyproj.Proj(
-                proj='aea',
-                lat1=geom.bounds[1],
-                lat2=geom.bounds[3])),
-        geom)
-    projected_area = geom_area.area
-    return projected_area * SQ_METER_TO_SQ_FEET
+    area = 0
+    if geom['type'] == 'MultiPolygon':
+        # pyarea doesn't support MultiPolygon, but all it is is this:
+        for poly in geom['coordinates']:
+            area += pyarea({
+                'type': 'Polygon',
+                'coordinates': poly,
+            })
+    else:
+        area = pyarea(geom)
+
+    return area * SQ_METER_TO_SQ_FEET
 
 
 def key_stats(features, *, lot_size, all_area_denom):

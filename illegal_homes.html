@@ -10,20 +10,20 @@
 </script>
 
 <!-- Primary Meta Tags -->
-<title>61% of San Francisco homes are in buildings that would be illegal to build today</title>
-<meta name="title" content="61% of San Francisco homes are in buildings that would be illegal to build today">
-<meta name="description" content="To comply with today's laws, 157,895 homes would have to be destroyed, evicting around 370,000 people.">
+<title>54% of San Francisco homes are in buildings that would be illegal to build today</title>
+<meta name="title" content="54% of San Francisco homes are in buildings that would be illegal to build today">
+<meta name="description" content="To comply with today's laws, 130,748 homes would have to be destroyed, evicting around 310,000 people.">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="61% of San Francisco homes are in buildings that would be illegal to build today">
-<meta property="og:description" content="To comply with today's laws, 157,895 homes would have to be destroyed, evicting around 370,000 people.">
+<meta property="og:title" content="54% of San Francisco homes are in buildings that would be illegal to build today">
+<meta property="og:description" content="To comply with today's laws, 130,748 homes would have to be destroyed, evicting around 310,000 people.">
 <meta property="og:image" content="/img/sf_illegal_homes.jpg">
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:title" content="61% of San Francisco homes are in buildings that would be illegal to build today">
-<meta property="twitter:description" content="To comply with today's laws, 157,895 homes would have to be destroyed, evicting around 370,000 people.">
+<meta property="twitter:title" content="54% of San Francisco homes are in buildings that would be illegal to build today">
+<meta property="twitter:description" content="To comply with today's laws, 130,748 homes would have to be destroyed, evicting around 310,000 people.">
 <meta property="twitter:image" content="/img/sf_illegal_homes.jpg">
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js"></script>
@@ -255,7 +255,7 @@ a:hover {
   <div id="legend" class="legend">
     <div class="section">
       <h3>About this map</h3>
-      <p>Over the past 100 years, San Francisco added numerous restrictions on housing construction. These restrictions are so severe that many existing homes would be illegal to build today. This map shows how many existing homes would be illegal to build today on each parcel of land:
+      <p>Over the past 100 years, San Francisco added numerous restrictions on housing construction. These restrictions are so severe that many existing homes would be illegal to build today. This map shows how many homes would be illegal on each parcel of land:
       <div id="legend-data"></div>
     </div>
     <div class="fun-facts section" id="fun-facts"></div>
@@ -280,32 +280,33 @@ a:hover {
       <li class="list-group-item"><strong>Illegal Homes: {{ illegal_units }}</strong></li>
       <li class="list-group-item">Illegal because: {{ reasons }}</li>
       <li class="list-group-item">Homes: {{ units }}</li>
-      <li class="list-group-item">Allowed Homes per Density Limit:
+      <li class="list-group-item">Height: {{ max_median_height | round }} ft</li>
+      <li class="list-group-item">Allowed Height: {{ allowed_height }} ft</li>
+      <li class="list-group-item">Lot Size: {{ lot_sq_ft | round }} sq ft</li>
+      <li class="list-group-item">Minimum Allowed Lot Size: {{ minimum_lot_sq_ft }} sq ft</li>
+      <li class="list-group-item">Zoning code: {{ zoning_code }}</li>
+      <li class="list-group-item">Allowed Homes per zoning code:
         {% if allowed_units_density > 10000000 %}
         No limit
         {% else %}
         {{ allowed_units_density | round }}
         {% endif %}
       </li>
-      <li class="list-group-item">Height: {{ max_median_height | round }} ft</li>
-      <li class="list-group-item">Allowed Height: {{ allowed_height }} ft</li>
-      <li class="list-group-item">Lot Size: {{ lot_sq_ft | round }} sq ft</li>
-      <li class="list-group-item">Minimum Allowed Lot Size: {{ minimum_lot_sq_ft }} sq ft</li>
-      <li class="list-group-item">Zoning code: {{ zoning_code }}</li>
       <li class="list-group-item">Year built: {{ year_built }}</li>
     </ul>
   </div>
   <div id="explainer-template">
     <h3>Why are these homes illegal to build?</h3>
-    <p>These buildings aren't illegal to build today because of safety reasons or any construction deficiencies - they are only illegal due to regulations called zoning laws that San Francisco passed to restrict the density of housing in certain areas, <a target="_blank" href="https://www.epi.org/publication/the-color-of-law-a-forgotten-history-of-how-our-government-segregated-america/">mainly to keep poor minorities out of white neighborhoods</a>.
+    <p>These buildings aren't illegal to build because of safety reasons or any construction deficiencies - they are only illegal due to regulations called zoning laws that San Francisco passed to restrict the density of housing in certain areas, <a target="_blank" href="https://www.epi.org/publication/the-color-of-law-a-forgotten-history-of-how-our-government-segregated-america/">originally to keep poor minorities out of white neighborhoods</a>.
     <p>Starting in <a target="_blank" href="https://archive.org/details/sf-zoning-1921">1921</a>, San Francisco has been steadily passing zoning laws to restrict housing construction in wealthy neighborhoods. This <a target="_blank" href="https://twitter.com/enf/status/999030803609899013">accelerated after 1968</a> when the <a target="_blank" href="https://en.wikipedia.org/wiki/Civil_Rights_Act_of_1968#Title_VIII%E2%80%93IX:_Fair_Housing_Act">Fair Housing Act</a> banned explicit race discrimination. Because minorities were poorer than whites and dense housing such as apartments is usually cheaper than single-family homes, the goal was to ban the construction of housing that poor minorities could afford.
+    <p>These days, many people who don't have explicitly racist motivations support zoning laws because they like the status quo, even though <a target="_blank" href="http://sfzoning.deapthoughts.com">the status quo bans the construction of affordable housing in most of the city</a>.
 
     <h3>How does San Francisco ban affordable housing?</h3>
     <p>If your goal is to make housing as expensive as possible, the best way to do it is to require lots of land per home, because land in cities is very expensive. San Francisco does this in a multitude of ways, but I decided to focus on 3 of them:
     <ul>
       <li><strong>Minimum lot size</strong>: San Francisco mandates that a lot must be at least 2,500 square feet (or 4,000 sqft in some cases) in order to build a home on it. Since a <a target="_blank" href="https://www.zillow.com/homedetails/415-Ivy-St-San-Francisco-CA-94102/15078362_zpid/?">decent single-family home could be built on a 500 sqft lot</a>, and a <a target="_blank" href="https://www.zillow.com/homedetails/2325-Ulloa-St-San-Francisco-CA-94116/15123381_zpid/">very nice single-family home can be built on a 1,200 sqft lot</a>, the minimum lot size requirement greatly reduces the amount of homes that could be built in San Francisco and increases the price of each home. {{ reason_counts["lot too small"] | commas }} homes would be illegal to build today because the lot size is too small.</li>
       <li><strong>Density limits</strong>: San Francisco mandates explicit density limits, from prohibiting apartments entirely (<a target="_blank" href="http://sfzoning.deapthoughts.com">in 76% of the city</a>) to mandating a minimum lot size per apartment (almost everywhere else). The sole reason for these limits is to make housing more scarce and therefore more expensive. San Francisco limits density in many other ways, such as <a target="_blank" href="https://en.wikipedia.org/wiki/Floor_area_ratio">floor-to-area ratio</a>, <a target="_blank" href="https://en.wikipedia.org/wiki/Setback_(land_use)">setback requirements</a>, etc. but to keep things simple, I looked only at the minimum lot size per apartment for this map. {{ reason_counts["too dense"] | commas }} homes would be illegal to build today because of density limits.</li>
-      <li><strong>Height limits</strong>: When land becomes expensive, developers can still create inexpensive homes by building multiple apartments on the same plot of land. Each apartment has to pay for only a fraction of the land cost, which can <a target="_blank" href="https://www.rent.com/blog/single-family-home-vs-apartment/">make apartments significantly cheaper than single-family homes</a>. The taller the apartment building, the less significant the cost of the land becomes, so San Francisco limits this savings by limiting the height of new buildings to 40 feet in most of the city. {{ reason_counts["too tall"] | commas }} homes would be illegal to build today because the building is too tall.</li>
+      <li><strong>Height limits</strong>: When land becomes expensive, developers can still create inexpensive homes by building multiple apartments on the same plot of land. Each apartment has to pay for only a fraction of the land cost, which can <a target="_blank" href="https://www.rent.com/blog/single-family-home-vs-apartment/">make apartments significantly cheaper than single-family homes</a>. The taller the apartment building, the less significant the cost of the land becomes, so San Francisco limits this savings by limiting the height of new buildings to 40 feet in most of the city. {{ reason_counts["too tall"] | commas }} homes would be illegal to build today because of height limits.</li>
     </ul>
     <p>Whenever San Francisco creates a new restriction, homes that already exist are grandfathered in rather than demolished. That's where all these "homes illegal to build today" come from.
 
@@ -314,7 +315,7 @@ a:hover {
 
     <h3>But how can you say that zoning laws are racist? San Francisco always tries to elevate the concerns of BIPOC communities!</h3>
     <p>These laws were originally created for racist reasons - that is a <a target="_blank" href="https://www.epi.org/publication/the-color-of-law-a-forgotten-history-of-how-our-government-segregated-america/">well-documented fact</a>, despite <a target="_blank" href="https://archive.is/A7kR1">what some San Francisco politicians claim</a>. These days, supporters of zoning probably don't have explicitly racist motivations. Instead, they are concerned about traffic, parking, shadows, "neighborhood character", or just don't like change and aren't personally affected by high rent.
-    <p>Still, even if the <em>intent</em> of zoning laws isn't racist, their <em>effect</em> has racist impacts. <a target="_blank" href="https://thebolditalic.com/the-dream-vs-reality-on-being-black-in-san-francisco-8a77f2176d1a">San Francisco's Black population declined from 13% of the city in the 1970s to 5.5% today</a>. Many of these Black families moved to Houston, <a target="_blank" href="https://webcache.googleusercontent.com/search?q=cache:OPBV3wCfme4J:https://www.latimes.com/opinion/op-ed/la-oe-0501-renn-reverse-great-migration-20160501-story.html+&cd=48&hl=en&ct=clnk&gl=us">which added 100,000 Black residents from 2010 to 2015</a>, and are now <a target="_blank" href="https://www.census.gov/quickfacts/fact/table/houstoncitytexas/PST045219">23% of the city's population</a>.
+    <p>Still, even if the <em>intent</em> of zoning laws isn't racist, their <em>effect</em> has racist impacts. <a target="_blank" href="https://thebolditalic.com/the-dream-vs-reality-on-being-black-in-san-francisco-8a77f2176d1a">San Francisco's Black population declined from 13% of the city in the 1970s to 5.5% today</a>. In contrast, zoning-free <a target="_blank" href="https://webcache.googleusercontent.com/search?q=cache:OPBV3wCfme4J:https://www.latimes.com/opinion/op-ed/la-oe-0501-renn-reverse-great-migration-20160501-story.html+&cd=48&hl=en&ct=clnk&gl=us">Houston added 100,000 Black residents from 2010 to 2015</a>, and Black people are now <a target="_blank" href="https://www.census.gov/quickfacts/fact/table/houstoncitytexas/PST045219">23% of Houston's population</a>.
 
     <h3>But all these organizations of low-income minorities claim that zoning laws protect them from displacement! Are you saying they're liars?</h3>
     <p>No, I don't think they are liars. In 2009, San Francisco enacted the <a target="_blank" href="https://sfplanning.org/eastern-neighborhoods-plans">Eastern Neighborhoods Plan</a>, which relaxed some zoning restrictions in poor neighborhoods only. Because tenants did not have adequate protection, and because the relaxation of these restrictions increased the upside of evicting rent-controlled tenants and redeveloping the property, areas such as the Mission experienced a wave of no-fault evictions and displacement of entire communities.
@@ -401,12 +402,6 @@ map.addControl(new mapboxgl.GeolocateControl({
     trackUserLocation: true
 }));
 
-// fit all of SF in the viewport
-map.fitBounds([
-  [-122.5203765565384, 37.700033803604006],
-  [-122.30764514054817, 37.813050877104246],
-]);
-
 
 var popupTemplate = compile("popup-template");
 var headerTemplate = compile("header-template");
@@ -429,6 +424,12 @@ $.getJSON('generated/sf/illegal_homes_key_data.json', function(keyData) {
   keyData.key.forEach(function(data) {
     legend.insertAdjacentHTML('beforeend', legendItemTemplate.render(data));
   });
+
+  // fit all of SF in the viewport
+  map.fitBounds([
+    [-122.5203765565384, 37.700033803604006],
+    [-122.30764514054817, 37.813050877104246],
+  ]);
 
   map.on('load', function () {
     map.addLayer({
