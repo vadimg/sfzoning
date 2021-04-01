@@ -400,16 +400,18 @@ map.addControl(new mapboxgl.GeolocateControl({
     trackUserLocation: true
 }));
 
+// fit all of SF in the viewport
+map.fitBounds([
+  [-122.5203765565384, 37.700033803604006],
+  [-122.30764514054817, 37.813050877104246],
+]);
+
 
 var popupTemplate = compile("popup-template");
 var headerTemplate = compile("header-template");
 var legendItemTemplate = compile("legend-item-template");
 var funFactsTemplate = compile("fun-facts-template");
 var explainerTemplate = compile("explainer-template");
-
-window.onhashchange = function() {
-  location.reload();
-};
 
 $.getJSON('generated/sf/illegal_homes_key_data.json', function(keyData) {
   document.getElementById('header').insertAdjacentHTML('beforeend', headerTemplate.render(keyData));
@@ -422,12 +424,6 @@ $.getJSON('generated/sf/illegal_homes_key_data.json', function(keyData) {
   keyData.key.forEach(function(data) {
     legend.insertAdjacentHTML('beforeend', legendItemTemplate.render(data));
   });
-
-  // fit all of SF in the viewport
-  map.fitBounds([
-    [-122.5203765565384, 37.700033803604006],
-    [-122.30764514054817, 37.813050877104246],
-  ]);
 
   map.on('load', function () {
     map.addLayer({
