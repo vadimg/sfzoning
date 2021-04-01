@@ -82,6 +82,9 @@ a:hover {
   flex-basis: auto;
 }
 
+/* get rid of the dumb blue border when map is in focus */
+.mapboxgl-canvas:focus { outline: none; }
+
 .mapboxgl-popup {
   max-width: 400px;
   font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
