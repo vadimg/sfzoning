@@ -10,19 +10,19 @@
 </script>
 
 <!-- Primary Meta Tags -->
-<title>54% of San Francisco homes are in buildings that would be illegal to build today</title>
-<meta name="title" content="54% of San Francisco homes are in buildings that would be illegal to build today" />
+<title>54% of San Francisco homes would be illegal to build today</title>
+<meta name="title" content="54% of San Francisco homes would be illegal to build today" />
 <meta name="description" content="To comply with today's laws, 130,748 homes would have to be destroyed, evicting around 310,000 people." />
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website" />
-<meta property="og:title" content="54% of San Francisco homes are in buildings that would be illegal to build today" />
+<meta property="og:title" content="54% of San Francisco homes would be illegal to build today" />
 <meta property="og:description" content="To comply with today's laws, 130,748 homes would have to be destroyed, evicting around 310,000 people." />
 <meta property="og:image" content="/img/sf_illegal_homes.jpg" />
 
-<!-- Twitter -->
+<!-- Twitter (is dumb, requires an image that's exactly 1200x638 for some reason) -->
 <meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:title" content="54% of San Francisco homes are in buildings that would be illegal to build today" />
+<meta property="twitter:title" content="54% of San Francisco homes would be illegal to build today" />
 <meta property="twitter:description" content="To comply with today's laws, 130,748 homes would have to be destroyed, evicting around 310,000 people." />
 <meta property="twitter:image" content="https://sfzoning.deapthoughts.com/img/sf_illegal_homes_twitter.jpg" />
 
@@ -415,7 +415,6 @@ var explainerTemplate = compile("explainer-template");
 
 $.getJSON('generated/sf/illegal_homes_key_data.json', function(keyData) {
   document.getElementById('header').insertAdjacentHTML('beforeend', headerTemplate.render(keyData));
-  document.title = headerTemplate.render(keyData);
   document.getElementById('fun-facts').insertAdjacentHTML('beforeend', funFactsTemplate.render(keyData));
   document.getElementById('explainer').insertAdjacentHTML('beforeend', explainerTemplate.render(keyData));
 
