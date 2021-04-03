@@ -26,11 +26,11 @@
 <meta property="twitter:description" content="To comply with today's laws, 130,748 homes would have to be destroyed, evicting around 310,000 people." />
 <meta property="twitter:image" content="https://sfzoning.deapthoughts.com/img/sf_illegal_homes_twitter.jpg" />
 
-<script src="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
 <script src="https://mozilla.github.io/nunjucks/files/nunjucks.min.js"></script>
-<link href="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
+<script src='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css' rel='stylesheet' />
 <style>
 
 body {
@@ -400,11 +400,11 @@ map.addControl(new mapboxgl.GeolocateControl({
     trackUserLocation: true
 }));
 
-// fit all of SF in the viewport
+// fit all of SF in the viewport (duration 0 disables zooming in animation)
 map.fitBounds([
   [-122.5203765565384, 37.700033803604006],
   [-122.30764514054817, 37.813050877104246],
-]);
+], {duration: 0});
 
 
 var popupTemplate = compile("popup-template");
