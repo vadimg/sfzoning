@@ -376,6 +376,13 @@ var map = new mapboxgl.Map({
     style: 'mapbox://styles/mapbox/dark-v10',
 });
 
+// Hide loading bar once tiles from geojson are loaded
+map.on('data', function(e) {
+    if (e.dataType === 'source' && e.sourceId === 'zones-layer') {
+        document.getElementById("loader").style.display = "none";
+    }
+});
+
 // disable map rotation using right click + drag
 map.dragRotate.disable();
 
@@ -442,13 +449,6 @@ $.getJSON('generated/sf/illegal_homes_key_data.json', function(keyData) {
           .setHTML(popupTemplate.render(prop))
           .addTo(map);
     });
-  });
-
-  // Hide loading bar once tiles from geojson are loaded
-  map.on('load', function(e) {
-    if (e.target && e.target.loaded()) {
-      document.getElementById("loader").style.display = "none";
-    }
   });
 });
 
