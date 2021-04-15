@@ -442,7 +442,6 @@ $.getJSON('generated/sf/illegal_homes_key_data.json', function(keyData) {
     // location of the click, with description HTML from its properties.
     map.on('click', 'zones-layer', function (e) {
       var prop = e.features[0].properties;
-      prop['lot_size'] = keyData.lot_size;
 
       new mapboxgl.Popup()
           .setLngLat(e.lngLat)
