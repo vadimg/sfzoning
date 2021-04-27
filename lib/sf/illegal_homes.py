@@ -152,7 +152,7 @@ def main():
     key_data.update(r.asdict())
 
     assert not nozones
-    dump('generated/sf/illegal_homes.geojson', illegal_homes)
+    dump(generated_path('sf/illegal_homes.geojson'), illegal_homes)
 
     with open(generated_path('sf/illegal_homes_key_data.json'), 'w') as f:
         json.dump(key_data, f)
