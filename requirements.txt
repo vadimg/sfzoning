@@ -5,5 +5,5 @@ pyproj==1.9.6
 PyYAML==5.4.1
 requests==2.22.0
 Shapely==1.6.4.post1
-ujson==1.35
+ujson==5.2.0
 urllib3==1.25.8
