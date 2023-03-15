@@ -3,7 +3,6 @@ from collections import defaultdict
 from shapely.geometry import shape
 
 import shapely.ops as ops
-import pyproj
 from area import area as pyarea
 
 METER_TO_FEET = 3.280839895

@@ -5,4 +5,3 @@ python3 -m venv ENV
 
 pip install -r requirements.txt
 pip install -e .  # install ourselves
-./get_data.sh

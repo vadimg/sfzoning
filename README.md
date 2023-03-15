@@ -6,7 +6,8 @@
 
 ## Steps
 
-Run `./install.sh`
+* Run `./install.sh`
+* Run `./get_data.sh` (this will take awhile, it needs to download a lot of data)
 
 # Run
 
