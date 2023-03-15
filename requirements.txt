@@ -5,5 +5,4 @@ idna==2.8
 PyYAML==5.4.1
 requests==2.22.0
 Shapely==1.6.4.post1
-ujson==1.35
-urllib3==1.25.8
+ujson==5.7.0
